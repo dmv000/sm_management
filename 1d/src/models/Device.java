@@ -14,7 +14,7 @@ public abstract class Device{
     public final int STANDBY = 2;
 
     public Device(){
-        //remove no arg when finishing config of the other classes
+
     }
 
     public Device(int id, String name, double maxPowerConsumption){
@@ -73,7 +73,9 @@ public abstract class Device{
 
     public abstract void turnOn();
 
-    public abstract void turnOff();
+    public void turnOff(){
+        status = OFF;
+    }
 
     public abstract double getCurrentConsumption();
     //return power is ON and 0 is OFF

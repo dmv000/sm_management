@@ -52,13 +52,8 @@ public class Light extends Device{
         if(adjustable) setLevel(level);
     }
 
-    //abstract --> had to add even though not required
-    public void turnOff(){
-        if(adjustable) level = 0;
-    }
-
-    public double getCurrentConsumption(){
-        return level * getMaxPowerConsumption();
+    public double getCurrentConsumption() {
+        return (getStatus() != OFF) ? level * getMaxPowerConsumption() : 0;
     }
 
     public String toString(){
