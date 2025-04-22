@@ -78,6 +78,9 @@ class ManagementSystem {
   - boolean day
   - ArrayList<Device> waitingListDay
   - ArrayList<Device> waitingListPower
+  + static double LOW
+  + static double NORMAL
+  + static double HIGH
   --
   + ManagementSystem(String adminPassword, String userPassword)
   + void changeAdminPassword(String)
@@ -98,6 +101,10 @@ class ManagementSystem {
   + void shutDownAllDevices()
   + void displayInfo()
   + double getCurrentConsumption()
+  + void displayMainMenu()
+  + void displayAdminMenu()
+  + void displayUserMenu()
+  + void run()
 }
 
 ' ========== RELATIONSHIPS ==========
