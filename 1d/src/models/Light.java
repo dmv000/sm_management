@@ -1,4 +1,5 @@
 package models;
 
-public class Light {
+public class Light extends Device{
+
 }
