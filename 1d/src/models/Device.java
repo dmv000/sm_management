@@ -71,18 +71,12 @@ public abstract class Device{
         this.critical = critical;
     }
 
-    public void turnOn(){
-        setStatus(ON);
-    }
+    public abstract void turnOn();
 
-    public void turnOff(){
-        setStatus(OFF);
-    }
+    public abstract void turnOff();
 
-    public double getCurrentConsumption(){
-        if(status == OFF) return 0;
-        else return maxPowerConsumption;
-    }
+    public abstract double getCurrentConsumption();
+    //return power is ON and 0 is OFF
 
     public String toString(){
         return "id = " + id + ", name = " + name + ", status: "
