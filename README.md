@@ -8,7 +8,7 @@
 skinparam classAttributeIconSize 0
 skinparam style strictuml
 
-========== ABSTRACT DEVICE ==========
+' ========== ABSTRACT DEVICE ==========
 abstract class Device {
   - int id
   - String name
