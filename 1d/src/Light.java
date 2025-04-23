@@ -1,5 +1,3 @@
-package models;
-
 public class Light extends Device{
     private boolean adjustable;
     int level; //between 0 and 100 def 100

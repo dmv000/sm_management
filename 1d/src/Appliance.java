@@ -1,5 +1,3 @@
-package models;
-
 public class Appliance extends Device{
     private int[] powerLevels;
     int currentLevel; //def = 0

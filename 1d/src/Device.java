@@ -1,5 +1,3 @@
-package models;
-
 public abstract class Device{
     private int id; //between 100 and 999 default 0--> incorrect setup
     private String name;
