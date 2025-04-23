@@ -44,7 +44,7 @@ public class Light extends Device{
         setStatus(ON);
         if(adjustable) level = 100;
     }
-
+    //this has no usage?
     public void turnOn(int level){
         setStatus(ON);
         if(adjustable) setLevel(level);
