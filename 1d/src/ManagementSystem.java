@@ -19,6 +19,8 @@ public class ManagementSystem {
     public ManagementSystem(String adminPassword, String userPassword){
         setAdminPassword(adminPassword);
         setUserPassword(userPassword);
+        setMaxAllowedPower(LOW);
+        setDayTime();
     }
 
     private void setAdminPassword(String adminPassword) {
@@ -51,7 +53,8 @@ public class ManagementSystem {
     public String displaySummaryAllRooms(){
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < rooms.size(); i++){
-            sb.append(rooms.get(i) +"\n");
+            sb.append(rooms.get(i));
+            sb.append("\n");
         }
         return sb.toString();
     }
@@ -92,18 +95,18 @@ public class ManagementSystem {
         }
         return false;
     }
-    //add remove device by id;
+    //add remove device by id; optional
 
     public void setDayTime(){
         day = true;
+        tryToTurnOnDevicesDay();
     }
-    //(day: remove everythign from dayWaitlist, turn on if possible, put rest in powerWaitList)
     //when set, ask user if he wants to turn on all lights in the house or not
 
     public void setNightTime(){
         day = false;
     }
-    //when set night --> check for running noisy devices --> off / standy by in waitlist / kept on
+    //when set night --> check for running noisy devices --> off / standy by in waitlist / kept on (ask user)
 
     public boolean turnOnDevice(String roomCode, int deviceId){
         for(int i = 0; i < searchRoomByCode(roomCode).getDevicesList().size(); i++){
@@ -115,19 +118,19 @@ public class ManagementSystem {
         return false;
     }
     //power constraint + !noisy || day --> on
-    //if noisy && night --> warning >> can turn off anyway / standby+waiting list / cancel
-    //if turn on and power > systemPowerMode --> waitlist / cancel
+    //if noisy && night --> warning >> can turn off anyway / standby+waiting list / cancel (ask user)
+    //if turn on and power > systemPowerMode --> waitlist / cancel (ask user)
 
     public boolean turnOffDevice(String roomCode, int deviceId){
         for(int i = 0; i < searchRoomByCode(roomCode).getDevicesList().size(); i++){
             if(searchRoomByCode(roomCode).getDevicesList().get(i).getId() == deviceId){
                 searchRoomByCode(roomCode).getDevicesList().get(i).turnOff();
+                tryToTurnOnDevicesPower();
                 return true;
             }
         }
         return false;
     }
-    //when turn off --> check for power standby device for first one that can be on without excceeding limit
     //if device is critical --> double confirm by entering admin password
 
     public void shutDownOneRoom(Room r){
@@ -164,10 +167,58 @@ public class ManagementSystem {
         return "";
     }
 
-    //add to standby power
-    // '' ''' ' day
-    //passwordIsAccepted --> admin, user, nothing (0 ,1, 2)
-    //boolean mode
-    //when exit admin mode / user mode --> display main menu;
+    //MYCODE
+
+    //when day is set, check the waitlist and turn on the devices if possible, if not, send it to powerWaitList
+    private void tryToTurnOnDevicesDay(){
+        if(waitingListDay.size() != 0){
+            for(int i = 0; i < waitingListDay.size(); i++){
+                if(waitingListDay.get(i).getCurrentConsumption() + getTotalPowerConsumption() < maxAllowedPower){
+                    waitingListDay.get(i).turnOn();
+                    waitingListDay.remove(waitingListDay.get(i));
+                } else {
+                    waitingListPower.add(waitingListDay.get(i));
+                    waitingListDay.remove(waitingListDay.get(i));
+                }
+            }
+        }
+    }
+
+    //normal setter
+    public void setMaxAllowedPower(double maxAllowedPower) {
+        if(maxAllowedPower == LOW || maxAllowedPower == NORMAL || maxAllowedPower == HIGH)
+            this.maxAllowedPower = maxAllowedPower;
+    }
+
+    //calculate total consumption between all rooms
+    private double getTotalPowerConsumption(){
+        double count = 0;
+        for(int i = 0; i < rooms.size(); i++){
+            count += rooms.get(i).getCurrentConsumption();
+        }
+        return count;
+    }
+
+    //check if the password matches any mode
+    public int CheckAccess(String s){
+        if(s.equals(userPassword)) return 1;
+        if(s.equals(adminPassword)) return 2;
+        else return 0;
+        //set mode?? boolean\
+        //when exit admin mode / user mode --> display main menu;
+    }
+
+    //when a device is turned off, check if a new device(s) can be turned on
+    private void tryToTurnOnDevicesPower(){
+        if(waitingListPower.size() != 0){
+            for(int i = 0; i < waitingListPower.size(); i++) {
+                if (waitingListPower.get(i).getCurrentConsumption() + getTotalPowerConsumption() < maxAllowedPower) {
+                    waitingListPower.get(i).turnOn();
+                    waitingListPower.remove(waitingListPower.get(i));
+                }
+            }
+        }
+    }
+
 
 }
