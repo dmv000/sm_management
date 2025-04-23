@@ -75,6 +75,7 @@ public abstract class Device{
     public abstract void turnOn();
 
     public void turnOff(){
+        //add double confirmation somehow
         status = OFF;
     }
 
