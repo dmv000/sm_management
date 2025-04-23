@@ -86,4 +86,8 @@ public abstract class Device{
                 + ", maximum power consumption = " + maxPowerConsumption + ", "
                 + ((critical) ? "critical" : "not critical");
     }
+
+    public boolean equals(Device d){
+        return id == d.getId();
+    }
 }
