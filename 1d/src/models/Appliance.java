@@ -10,10 +10,7 @@ public class Appliance extends Device{
     }
 
     public Appliance(int id, String name, double maxPowerConsumption, boolean critical, int[] powerLevels, boolean noisy){
-        setId(id);
-        setName(name);
-        setMaxPowerConsumption(maxPowerConsumption);
-        setCritical(critical);
+        super(id, name, maxPowerConsumption, critical);
         setPowerLevels(powerLevels);
         setNoisy(noisy);
     }
@@ -35,7 +32,7 @@ public class Appliance extends Device{
     }
 
     public void setCurrentLevel(int currentLevel) {
-        if(currentLevel >= 0 && currentLevel <= powerLevels.length) this.currentLevel = currentLevel;
+        if(currentLevel >= 0 && currentLevel < powerLevels.length) this.currentLevel = currentLevel;
         else currentLevel = 0;
     }
 
@@ -46,10 +43,12 @@ public class Appliance extends Device{
     //check working again
     public void turnOn() {
         //power level 0?????
+        setStatus(ON);
         currentLevel = 0;
     }
 
     public void turnOn(int level){
+        setStatus(ON);
         setCurrentLevel(level);
     }
 

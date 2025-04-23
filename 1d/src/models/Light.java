@@ -2,7 +2,7 @@ package models;
 
 public class Light extends Device{
     private boolean adjustable;
-    int level; //between 0 and 100
+    int level; //between 0 and 100 def 100
 
     public Light(int id, String name, double maxPowerConsumption){
         this(id, name, maxPowerConsumption, false, false);
@@ -13,11 +13,9 @@ public class Light extends Device{
     }
 
     public Light(int id, String name, double maxPowerConsumption, boolean critical, boolean adjustable){
-        setId(id);
-        setName(name);
-        setMaxPowerConsumption(maxPowerConsumption);
-        setCritical(critical);
+        super(id, name, maxPowerConsumption, critical);
         setAdjustable(adjustable);
+        setLevel(100);
     }
 
     public boolean isAdjustable() {
@@ -45,10 +43,12 @@ public class Light extends Device{
     //to be determined later
 
     public void turnOn(){
+        setStatus(ON);
         if(adjustable) level = 100;
     }
 
     public void turnOn(int level){
+        setStatus(ON);
         if(adjustable) setLevel(level);
     }
 

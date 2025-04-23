@@ -9,9 +9,9 @@ public abstract class Device{
     //critical devices cannot be shutdown without double confirmation
     //how to put double confirmation????
 
-    public final int OFF = 0;
-    public final int ON = 1;
-    public final int STANDBY = 2;
+    public final static int OFF = 0;
+    public final static int ON = 1;
+    public final static int STANDBY = 2;
 
     public Device(){
 
@@ -60,6 +60,7 @@ public abstract class Device{
 
     public void setStatus(int status) {
         if(status >= OFF && status <= STANDBY) this.status = status;
+        else this.status = OFF;
     }
 
     public void setMaxPowerConsumption(double maxPowerConsumption) {
