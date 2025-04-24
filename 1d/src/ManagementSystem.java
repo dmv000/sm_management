@@ -118,7 +118,7 @@ public class ManagementSystem {
         return false;
     }
     //power constraint + !noisy || day --> on
-    //if noisy && night --> warning >> can turn off anyway / standby+waiting list / cancel (ask user)
+    //if noisy && night --> warning >> can turn on anyway / standby+waiting list / cancel (ask user)
     //if turn on and power > systemPowerMode --> waitlist / cancel (ask user)
 
     public boolean turnOffDevice(String roomCode, int deviceId){
