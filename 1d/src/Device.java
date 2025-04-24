@@ -12,13 +12,11 @@ public abstract class Device{
     public final static int STANDBY = 2;
 
     public Device(){
-
     }
-
     public Device(int id, String name, double maxPowerConsumption){
+
         this(id, name, maxPowerConsumption, false);
     }
-
     public Device(int id, String name, double maxPowerConsumption, boolean critical){
         setId(id);
         setName(name);
@@ -27,48 +25,47 @@ public abstract class Device{
         //status = 0
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getStatus(){
-        return status;
-    }
-
-    public double getMaxPowerConsumption() {
-        return maxPowerConsumption;
-    }
-
-    public boolean isCritical() {
-        return critical;
-    }
-
     public void setId(int id) {
         if (id>=100 && id <= 999) this.id = id;
         else this.id = 0;
+    }
+    public int getId() {
+
+        return id;
     }
 
     public void setName(String name) {
         this.name = name;
     }
+    public String getName() {
+        return name;
+    }
+
 
     public void setStatus(int status) {
         if(status >= OFF && status <= STANDBY) this.status = status;
         else this.status = OFF;
     }
+    public int getStatus(){
+        return status;
+    }
+
 
     public void setMaxPowerConsumption(double maxPowerConsumption) {
         if(maxPowerConsumption >= 0) this.maxPowerConsumption = maxPowerConsumption;
         else this.maxPowerConsumption = 50;
     }
+    public double getMaxPowerConsumption() {
+        return maxPowerConsumption;
+    }
 
     public void setCritical(boolean critical) {
         this.critical = critical;
     }
+    public boolean isCritical() {
+        return critical;
+    }
+
 
     public abstract void turnOn();
 
@@ -80,6 +77,10 @@ public abstract class Device{
     public abstract double getCurrentConsumption();
     //return power is ON and 0 is OFF
 
+    public boolean equals(Device d){
+        return id == d.getId();
+    }
+
     public String toString(){
         return "id = " + id + ", name = " + name + ", status: "
                 + ((status == OFF) ? "Off" : (status == ON) ? "On" : "Standby")
@@ -87,7 +88,5 @@ public abstract class Device{
                 + ((critical) ? "critical" : "not critical");
     }
 
-    public boolean equals(Device d){
-        return id == d.getId();
-    }
+
 }

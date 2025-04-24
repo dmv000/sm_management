@@ -5,17 +5,18 @@ public class Light extends Device{
     public Light(int id, String name, double maxPowerConsumption){
         this(id, name, maxPowerConsumption, false, false);
     }
-
     public Light(int id, String name, double maxPowerConsumption, boolean critical){
         this(id, name, maxPowerConsumption, critical, false);
     }
-
     public Light(int id, String name, double maxPowerConsumption, boolean critical, boolean adjustable){
         super(id, name, maxPowerConsumption, critical);
         setAdjustable(adjustable);
         setLevel(100);
     }
 
+    public void setAdjustable(boolean adjustable) {
+        this.adjustable = adjustable;
+    }
     public boolean isAdjustable() {
         return adjustable;
     }
@@ -23,11 +24,6 @@ public class Light extends Device{
     public int getLevel() {
         return level;
     }
-
-    public void setAdjustable(boolean adjustable) {
-        this.adjustable = adjustable;
-    }
-
     public void setLevel(int level){
         if(adjustable) {
             if(level >= 0 && level <= 100) this.level = level;

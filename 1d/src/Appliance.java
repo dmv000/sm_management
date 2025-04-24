@@ -16,22 +16,21 @@ public class Appliance extends Device{
     public int[] getPowerLevels() {
         return powerLevels;
     }
-
-    public int getCurrentLevel() {
-        return currentLevel;
-    }
-
-    public boolean isNoisy() {
-        return noisy;
-    }
-
     public void setPowerLevels(int[] powerLevels) {
         this.powerLevels = powerLevels;
     }
 
+    public int getCurrentLevel() {
+        return currentLevel;
+    }
     public void setCurrentLevel(int currentLevel) {
         if(currentLevel >= 0 && currentLevel < powerLevels.length) this.currentLevel = currentLevel;
         else currentLevel = 0;
+    }
+
+
+    public boolean isNoisy() {
+        return noisy;
     }
 
     public void setNoisy(boolean noisy) {
