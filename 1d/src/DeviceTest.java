@@ -6,5 +6,19 @@ public class DeviceTest {
         A1.turnOn(1);
         System.out.println(A1.getCurrentConsumption());
         System.out.println(A1);
+        A1.turnOff();
+        System.out.println(A1);
+
+        Light L1 = new Light(100, "Light", 50, false, true);
+        L1.turnOn(50);
+        System.out.println(L1.getCurrentConsumption());
+        System.out.println(L1);
+        L1.turnOff();
+        System.out.println(L1);
+
+        Room r1= new Room("L1", "Living Room");
+        r1.addDevice(L1);
+        r1.addDevice(A1);
+        System.out.println(r1);
     }
 }

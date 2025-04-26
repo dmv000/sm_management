@@ -20,6 +20,9 @@ public class ManagementSystem {
         setUserPassword(userPassword);
         setMaxAllowedPower(LOW);
         setDayTime();
+        rooms = new ArrayList<Room>();
+        waitingListDay = new ArrayList<Device>();
+        waitingListPower = new ArrayList<Device>();
     }
 
     private void setAdminPassword(String adminPassword) {

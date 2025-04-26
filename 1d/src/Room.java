@@ -8,6 +8,7 @@ public class Room {
     public Room(String code, String description){
         setCode(code);
         setDescription(description);
+        devicesList = new ArrayList<Device>();
     }
 
     public String getCode() {
@@ -75,7 +76,8 @@ public class Room {
     }
 
     public String toString(){
-        String s = "Devices: \n";
+        String s = getCode() +"/" +getDescription() +":\n"
+                +"Devices: \n";
         for(int i = 0; i < devicesList.size(); i++){
             s += devicesList.get(i).toString() + "\n";
         }
