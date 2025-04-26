@@ -277,5 +277,37 @@ public class ManagementSystem {
     }
 
     //standby methods (add, remove, display)
+    public void addDeviceToWaitingListDay(Device d){
+        d.setStatus(Device.STANDBY);
+        waitingListDay.add(d);
+    }
 
+    public void RemoveDeviceFromWaitingListDay(Device d){
+        waitingListDay.remove(d);
+    }
+
+    public String listStandByDayDevices(){
+        String s = "";
+        for(Device i : waitingListDay){
+            s += i.getId() + "\n";
+        }
+        return s;
+    }
+
+    public void addDeviceToWaitingListPower(Device d){
+        d.setStatus(Device.STANDBY);
+        waitingListPower.add(d);
+    }
+
+    public void RemoveDeviceFromWaitingListPower(Device d){
+        waitingListPower.remove(d);
+    }
+
+    public String listStandByPowerDevices(){
+        String s = "";
+        for(Device i : waitingListPower){
+            s += i.getId() + "\n";
+        }
+        return s;
+    }
 }

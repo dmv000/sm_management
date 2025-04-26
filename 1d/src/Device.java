@@ -28,8 +28,9 @@ public abstract class Device{
         if (id>=100 && id <= 999) this.id = id;
         else this.id = 0;
     }
-    public int getId() {
+    //check that ids are not identical
 
+    public int getId() {
         return id;
     }
 
