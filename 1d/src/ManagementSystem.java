@@ -251,7 +251,7 @@ public class ManagementSystem {
         }
     }
 
-    private boolean checkForRuningNoisyDevices(){
+    private boolean checkForRunningNoisyDevices(){
         for(int i = 0; i < rooms.size(); i++){
             for(int j = 0; j < rooms.get(i).getDevicesList().size(); i++){
                 if(rooms.get(i).getDevicesList().get(j) instanceof Appliance){
