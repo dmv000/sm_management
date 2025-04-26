@@ -55,11 +55,10 @@ public class Appliance extends Device{
     }
 
     public String toString(){
-        String s = "Appliance{ " + super.toString() + ", power levels = {[";
+        String s = "Appliance{" + super.toString() + ", power levels = {[";
         for(int i = 0; i < powerLevels.length; i++)
-            s += (powerLevels[i] < (powerLevels[powerLevels.length - 1]))? powerLevels[i]+ ", ":powerLevels[i];
-        s += "]}, level = " + currentLevel + ", "
-                + ((noisy) ? "noisy" : "not noisy");
+            s += (i < powerLevels.length - 1 ? powerLevels[i] + ", " : powerLevels[i]);
+        s += "]}, level = " + currentLevel + ", " + ((noisy) ? "noisy" : "not noisy}");
         return s;
     }
 }
