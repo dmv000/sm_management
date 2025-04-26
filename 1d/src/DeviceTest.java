@@ -20,5 +20,6 @@ public class DeviceTest {
         r1.addDevice(L1);
         r1.addDevice(A1);
         System.out.println(r1);
+
     }
 }
