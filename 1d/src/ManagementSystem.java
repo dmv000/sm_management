@@ -16,13 +16,13 @@ public class ManagementSystem {
     private ArrayList<Device> waitingListPower; //standby until power allows it
 
     public ManagementSystem(String adminPassword, String userPassword){
+        rooms = new ArrayList<Room>();
+        waitingListDay = new ArrayList<Device>();
+        waitingListPower = new ArrayList<Device>();
         setAdminPassword(adminPassword);
         setUserPassword(userPassword);
         setMaxAllowedPower(LOW);
         setDayTime();
-        rooms = new ArrayList<Room>();
-        waitingListDay = new ArrayList<Device>();
-        waitingListPower = new ArrayList<Device>();
     }
 
     private void setAdminPassword(String adminPassword) {

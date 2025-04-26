@@ -22,11 +22,12 @@ public class DeviceTest {
         r1.removeDevice(A1);
         System.out.println(r1);
         System.out.println(r1.getCurrentConsumption());
-
         System.out.println(r1.searchDeviceById(100));
+
+
         ManagementSystem M1 = new ManagementSystem("123456Ab","123456Ba");
-        M1.addRoom(r1);
-        System.out.println(M1.displayInfo());
-        System.out.println(M1.displayDetailsOneRoom("L1"));
+        //M1.addRoom(r1);
+        //System.out.println(M1.displayInfo());
+        //System.out.println(M1.displayDetailsOneRoom("L1"));
     }
 }
