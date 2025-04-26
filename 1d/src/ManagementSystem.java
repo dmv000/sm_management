@@ -74,7 +74,7 @@ public class ManagementSystem {
     }
 
     public boolean addDevice(Device d, Room r){
-        if(rooms.contains(r)) return false;
+        if(rooms.contains(d)) return false;
         rooms.get(rooms.indexOf(r)).addDevice(d);
         return true;
     }
