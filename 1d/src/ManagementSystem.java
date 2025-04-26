@@ -74,7 +74,7 @@ public class ManagementSystem {
     }
 
     public boolean addDevice(Device d, Room r){
-        if(rooms.contains(d)) return false;
+        if(rooms.contains(r)) return false;
         rooms.get(rooms.indexOf(r)).addDevice(d);
         return true;
     }
@@ -119,6 +119,7 @@ public class ManagementSystem {
         for(int i = 0; i < searchRoomByCode(roomCode).getDevicesList().size(); i++){
             if(searchRoomByCode(roomCode).getDevicesList().get(i).getId() == deviceId){
                 searchRoomByCode(roomCode).getDevicesList().get(i).turnOn();
+                return true;
             }
         }
         return false;
@@ -164,7 +165,7 @@ public class ManagementSystem {
     public void shutDownAllDevices(){
         for(int i = 0; i < rooms.size(); i++){
             for(int j = 0; j < rooms.get(i).getDevicesList().size(); j++){
-                turnOffDevice(rooms.get(i).getCode(), rooms.get(i).getDevicesList().get(i).getId());
+                turnOffDevice(rooms.get(i).getCode(), rooms.get(j).getDevicesList().get(i).getId());
             }
         }
     }
@@ -186,6 +187,7 @@ public class ManagementSystem {
     }
 
     public String displayInfo(){
+        //to be implemented
         return "";
     }
 
@@ -244,7 +246,7 @@ public class ManagementSystem {
 
     public void turnOnAllLightsInHouse(){
         for(int i = 0; i < rooms.size(); i++){
-            for(int j = 0; j < rooms.get(i).getDevicesList().size(); i++){
+            for(int j = 0; j < rooms.get(i).getDevicesList().size(); j++){
                 if(rooms.get(i).getDevicesList().get(j) instanceof Light)
                     rooms.get(i).getDevicesList().get(j).turnOn();
             }
@@ -253,7 +255,7 @@ public class ManagementSystem {
 
     private boolean checkForRunningNoisyDevices(){
         for(int i = 0; i < rooms.size(); i++){
-            for(int j = 0; j < rooms.get(i).getDevicesList().size(); i++){
+            for(int j = 0; j < rooms.get(i).getDevicesList().size(); j++){
                 if(rooms.get(i).getDevicesList().get(j) instanceof Appliance){
                     if (((Appliance)rooms.get(i).getDevicesList().get(j)).isNoisy())
                         return true;
@@ -266,7 +268,7 @@ public class ManagementSystem {
     //set the newStatus for all noisy devices only
     public void setNoisyDeviceStatus(int newStatus){
         for(int i = 0; i < rooms.size(); i++){
-            for(int j = 0; j < rooms.get(i).getDevicesList().size(); i++){
+            for(int j = 0; j < rooms.get(i).getDevicesList().size(); j++){
                 if(rooms.get(i).getDevicesList().get(j) instanceof Appliance
                         && ((Appliance) rooms.get(i).getDevicesList().get(j)).isNoisy()){
                     rooms.get(i).getDevicesList().get(j).setStatus(newStatus);
@@ -285,16 +287,16 @@ public class ManagementSystem {
         waitingListDay.add(d);
     }
 
-    public void RemoveDeviceFromWaitingListDay(Device d){
+    public void removeDeviceFromWaitingListDay(Device d){
         waitingListDay.remove(d);
     }
 
     public String listStandByDayDevices(){
-        String s = "";
+        StringBuilder sb = new StringBuilder();
         for(Device i : waitingListDay){
-            s += i.getId() + "\n";
+            sb.append(i.getId() + "\n");
         }
-        return s;
+        return sb.toString();
     }
 
     public void addDeviceToWaitingListPower(Device d){
@@ -302,15 +304,15 @@ public class ManagementSystem {
         waitingListPower.add(d);
     }
 
-    public void RemoveDeviceFromWaitingListPower(Device d){
+    public void removeDeviceFromWaitingListPower(Device d){
         waitingListPower.remove(d);
     }
 
     public String listStandByPowerDevices(){
-        String s = "";
+        StringBuilder sb = new StringBuilder();
         for(Device i : waitingListPower){
-            s += i.getId() + "\n";
+            sb.append(i.getId() + "\n");
         }
-        return s;
+        return sb.toString();
     }
 }
