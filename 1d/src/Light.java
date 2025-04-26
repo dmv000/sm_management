@@ -51,7 +51,7 @@ public class Light extends Device{
     }
 
     public String toString(){
-        return "Light{ " + super.toString() + ", "
+        return "Light{" + super.toString() + ", "
                 +((adjustable) ? "adjustable" : "not adjustable")
                 +", level = " + level + "}";
     }
