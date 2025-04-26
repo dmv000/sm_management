@@ -5,7 +5,6 @@ public abstract class Device{
     private double maxPowerConsumption; //def = 50 //>0
     private boolean critical; // def = false
     //critical devices cannot be shutdown without double confirmation
-    //how to put double confirmation????
 
     public final static int OFF = 0;
     public final static int ON = 1;
@@ -71,11 +70,11 @@ public abstract class Device{
 
     public void turnOff(){
         //add double confirmation somehow
-        status = OFF;
+        setStatus(OFF);
     }
 
     public abstract double getCurrentConsumption();
-    //return power is ON and 0 is OFF
+    //return power if ON and 0 if OFF
 
     public boolean equals(Device d){
         return id == d.getId();

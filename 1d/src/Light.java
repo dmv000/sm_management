@@ -47,7 +47,7 @@ public class Light extends Device{
     }
 
     public double getCurrentConsumption() {
-        return (getStatus() != OFF) ? level * getMaxPowerConsumption() : 0;
+        return (getStatus() == ON) ? level * getMaxPowerConsumption() : 0;
     }
 
     public String toString(){

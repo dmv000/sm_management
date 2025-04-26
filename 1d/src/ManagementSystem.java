@@ -1,4 +1,3 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.lang.StringBuilder;
 
@@ -101,37 +100,58 @@ public class ManagementSystem {
         day = true;
         tryToTurnOnDevicesDay();
     }
-    //when set, ask user if he wants to turn on all lights in the house or not
+    //setDaytime is prompted, ask user if he wants to turn on all lights in the house or not
+    //use method --turnOnAllLightsInHouse()
 
     public void setNightTime(){
         day = false;
     }
-    //when set night --> check for running noisy devices --> off / standy by in waitlist / kept on (ask user)
+    //when set night --> checks for running noisy devices --> input user --> off / standy by in waitlist / kept on (ask user)
+    //use methods --checkForRuningNoisyDevices() --setNoisyDeviceStatus()
 
     public boolean turnOnDevice(String roomCode, int deviceId){
+        //check if roomCode is valid
+        if(searchRoomByCode(roomCode) == null) return false;
+        //check room if the device is present
         for(int i = 0; i < searchRoomByCode(roomCode).getDevicesList().size(); i++){
             if(searchRoomByCode(roomCode).getDevicesList().get(i).getId() == deviceId){
                 searchRoomByCode(roomCode).getDevicesList().get(i).turnOn();
-                return true;
             }
         }
         return false;
     }
-    //power constraint + !noisy || day --> on
-    //if noisy && night --> warning >> can turn on anyway / standby+waiting list / cancel (ask user)
-    //if turn on and power > systemPowerMode --> waitlist / cancel (ask user)
+    //returns false is device is not found in the room or room is invalid
+
+    public int checkTurnOnDevice(Device d){
+        if(!(d.getCurrentConsumption() + getTotalPowerConsumption() <= maxAllowedPower)) return 2;
+        if(d instanceof Appliance){
+            if((((Appliance) d).isNoisy()) && !day) return 1;
+        }
+        return 0;
+    }
+
+    //0 >> no constraints
+    //1 >> noisy and night>> can turn on anyway / standby+waiting list / cancel (ask user)
+    //2 >> not enough power --> waitlist / cancel (ask user)
 
     public boolean turnOffDevice(String roomCode, int deviceId){
+        //check if roomCode is valid
+        if(searchRoomByCode(roomCode) == null) return false;
+        //check room if the device is present
         for(int i = 0; i < searchRoomByCode(roomCode).getDevicesList().size(); i++){
             if(searchRoomByCode(roomCode).getDevicesList().get(i).getId() == deviceId){
-                searchRoomByCode(roomCode).getDevicesList().get(i).turnOff();
-                tryToTurnOnDevicesPower();
+                turnOffDevice(searchRoomByCode(roomCode).getDevicesList().get(i));
                 return true;
             }
         }
         return false;
     }
-    //if device is critical --> double confirm by entering admin password
+    //returns false is device is not found in the room or room is invalid
+
+    public void turnOffDevice(Device d){
+        d.turnOff();
+        tryToTurnOnDevicesPower();
+    }
 
     public void shutDownOneRoom(Room r){
         for(int i = 0; i < r.getDevicesList().size(); i++){
@@ -167,13 +187,13 @@ public class ManagementSystem {
         return "";
     }
 
-    //MYCODE
+    //More code
 
     //when day is set, check the waitlist and turn on the devices if possible, if not, send it to powerWaitList
     private void tryToTurnOnDevicesDay(){
         if(waitingListDay.size() != 0){
             for(int i = 0; i < waitingListDay.size(); i++){
-                if(waitingListDay.get(i).getCurrentConsumption() + getTotalPowerConsumption() < maxAllowedPower){
+                if(waitingListDay.get(i).getCurrentConsumption() + getTotalPowerConsumption() <= maxAllowedPower){
                     waitingListDay.get(i).turnOn();
                     waitingListDay.remove(waitingListDay.get(i));
                 } else {
@@ -200,7 +220,7 @@ public class ManagementSystem {
     }
 
     //check if the password matches any mode
-    public int CheckAccess(String s){
+    public int checkAccess(String s){
         if(s.equals(userPassword)) return 1;
         if(s.equals(adminPassword)) return 2;
         else return 0;
@@ -215,6 +235,43 @@ public class ManagementSystem {
                 if (waitingListPower.get(i).getCurrentConsumption() + getTotalPowerConsumption() < maxAllowedPower) {
                     waitingListPower.get(i).turnOn();
                     waitingListPower.remove(waitingListPower.get(i));
+                }
+            }
+        }
+    }
+
+    public void turnOnAllLightsInHouse(){
+        for(int i = 0; i < rooms.size(); i++){
+            for(int j = 0; j < rooms.get(i).getDevicesList().size(); i++){
+                if(rooms.get(i).getDevicesList().get(j) instanceof Light)
+                    rooms.get(i).getDevicesList().get(j).turnOn();
+            }
+        }
+    }
+
+    private boolean checkForRuningNoisyDevices(){
+        for(int i = 0; i < rooms.size(); i++){
+            for(int j = 0; j < rooms.get(i).getDevicesList().size(); i++){
+                if(rooms.get(i).getDevicesList().get(j) instanceof Appliance){
+                    if (((Appliance)rooms.get(i).getDevicesList().get(j)).isNoisy())
+                        return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    //set the newStatus for all noisy devices only
+    public void setNoisyDeviceStatus(int newStatus){
+        for(int i = 0; i < rooms.size(); i++){
+            for(int j = 0; j < rooms.get(i).getDevicesList().size(); i++){
+                if(rooms.get(i).getDevicesList().get(j) instanceof Appliance
+                        && ((Appliance) rooms.get(i).getDevicesList().get(j)).isNoisy()){
+                    rooms.get(i).getDevicesList().get(j).setStatus(newStatus);
+                    //add to waitlist if standby
+                    if(newStatus == Device.STANDBY){
+                        waitingListDay.add((rooms.get(i).getDevicesList().get(j)));
+                    }
                 }
             }
         }

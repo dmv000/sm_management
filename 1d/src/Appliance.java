@@ -50,7 +50,7 @@ public class Appliance extends Device{
     }
 
     public double getCurrentConsumption() {
-        return (getStatus() != OFF) ? powerLevels[currentLevel] * getMaxPowerConsumption() : 0;
+        return (getStatus() == ON) ? (powerLevels[currentLevel]/100.0) * getMaxPowerConsumption() : 0;
 
     }
 
