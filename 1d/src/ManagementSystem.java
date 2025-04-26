@@ -74,9 +74,13 @@ public class ManagementSystem {
     }
 
     public boolean addDevice(Device d, Room r){
-        if(rooms.contains(r)) return false;
-        rooms.get(rooms.indexOf(r)).addDevice(d);
-        return true;
+        for(Room room : rooms){
+            if(room.equals(r)){
+                room.addDevice(d);
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean removeRooms(Room r){
@@ -165,7 +169,7 @@ public class ManagementSystem {
     public void shutDownAllDevices(){
         for(int i = 0; i < rooms.size(); i++){
             for(int j = 0; j < rooms.get(i).getDevicesList().size(); j++){
-                turnOffDevice(rooms.get(i).getCode(), rooms.get(j).getDevicesList().get(i).getId());
+                turnOffDevice(rooms.get(i).getCode(), rooms.get(i).getDevicesList().get(j).getId());
             }
         }
     }
