@@ -129,7 +129,6 @@ public class ManagementSystem {
         }
         return 0;
     }
-
     //0 >> no constraints
     //1 >> noisy and night>> can turn on anyway / standby+waiting list / cancel (ask user)
     //2 >> not enough power --> waitlist / cancel (ask user)
@@ -276,4 +275,7 @@ public class ManagementSystem {
             }
         }
     }
+
+    //standby methods (add, remove, display)
+
 }
