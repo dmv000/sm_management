@@ -163,6 +163,8 @@ public class ManagementSystem {
 
     public void turnOffDevice(Device d){
         d.turnOff();
+        removeDeviceFromWaitingListDay(d);
+        removeDeviceFromWaitingListPower(d);
         tryToTurnOnDevicesPower();
     }
 
