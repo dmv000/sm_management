@@ -42,7 +42,7 @@
 | + checkAccess(s: String): int                            | // Authenticates user or admin access (1=user, 2=admin, 0=denied)
 | - tryToTurnOnDevicesPower(): void                        | // Turns on devices from the power waiting list if possible
 | + turnOnAllLightsInHouse(): void                         | // Turns on all Light devices across all rooms
-| - checkForRunningNoisyDevices(): boolean                  | // Checks if any noisy devices are running at night
+| + checkForRunningNoisyDevices(): boolean                  | // Checks if any noisy devices are running at night
 | + setNoisyDeviceStatus(newStatus: int): void             | // Changes status of all noisy devices
 | + addDeviceToWaitingListDay(d: Device): void             | // Adds device to day standby list
 | + RemoveDeviceFromWaitingListDay(d: Device): void        | // Removes device from day standby list
