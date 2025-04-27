@@ -32,8 +32,8 @@ public class Light extends Device{
 
     //nonadjustable lights cannot be turned on or off and
 
-    // ----this might need to have sort of an @override or @overload method----
-    //---for the set level of the adjustable light, non_adjustable lights, and the default one----
+    // -----this might need to have sort of an @override or @overload method----
+    //----for the set level of the adjustable light, non_adjustable lights, and the default one----
 
     //constantly stay at the same level
     //may add feature for the turn off function to save previous level
