@@ -322,7 +322,7 @@ public class ManagementSystem {
 
     public String listStandByPowerDevices(){
         StringBuilder sb = new StringBuilder();
-        for(Device i : waitingListPower){
+        for (Device i : waitingListPower){
             sb.append(i.getId() + "\n");
         }
         return sb.toString();
