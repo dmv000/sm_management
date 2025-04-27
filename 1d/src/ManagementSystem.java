@@ -299,7 +299,7 @@ public class ManagementSystem {
         waitingListDay.add(d);
     }
 
-    public void removeDeviceFromWaitingListDay(Device d){
+    private void removeDeviceFromWaitingListDay(Device d){
         if(waitingListDay.contains(d)) waitingListDay.remove(d);
     }
 
@@ -316,7 +316,7 @@ public class ManagementSystem {
         waitingListPower.add(d);
     }
 
-    public void removeDeviceFromWaitingListPower(Device d){
+    private void removeDeviceFromWaitingListPower(Device d){
         if(waitingListPower.contains(d)) waitingListPower.remove(d);
     }
 
