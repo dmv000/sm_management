@@ -1,8 +1,7 @@
 public class DeviceTest {
     public static void main(String[] args) {
        // 1. Basic System & Password
-       // -------------we should include a way to organize many systems in one.
-//>>>>>i think its only one system but will ask monday
+       // TODO-------------we should include a way to organize many systems in one.
        //like a list with ID for each system we select from it
        //example system1 has ID 1 it goes to the location 0 i the array and retrieve it?
         ManagementSystem system1 = new ManagementSystem("Admin123", "User1234");
