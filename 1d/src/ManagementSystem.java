@@ -129,6 +129,9 @@ public class ManagementSystem {
         return false;
     }
     //returns false is device is not found in the room or room is invalid
+    //use --checkTurnOnDevice() in main to check for the conditions:
+    //if(checkTurnOnDevice(d)) turnOnDevice
+    //use a switch for all other conditions
 
     public int checkTurnOnDevice(Device d){
         if(!(d.getCurrentConsumption() + getTotalPowerConsumption() <= maxAllowedPower)) return 2;
@@ -257,7 +260,7 @@ public class ManagementSystem {
         }
     }
 
-    private boolean checkForRunningNoisyDevices(){
+    public boolean checkForRunningNoisyDevices(){
         for(int i = 0; i < rooms.size(); i++){
             for(int j = 0; j < rooms.get(i).getDevicesList().size(); j++){
                 if(rooms.get(i).getDevicesList().get(j) instanceof Appliance){
