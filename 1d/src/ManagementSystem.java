@@ -10,6 +10,10 @@ public class ManagementSystem {
     public final static int LOW = 1000;
     public final static int NORMAL = 4000;
     public final static int HIGH = 10000;
+    //3 access Levels
+    public final static int NOACCESS = 0;
+    public final static int USER = 1;
+    public final static int ADMIN = 2;
 
     private boolean day; //T=Day, F=Night
     private ArrayList<Device> waitingListDay; //standby until day // for noisy
@@ -25,11 +29,11 @@ public class ManagementSystem {
         setDayTime();
     }
 
-    private void setAdminPassword(String adminPassword) {
+    public void setAdminPassword(String adminPassword) {
         if(passwordIsValid(adminPassword)) this.adminPassword = adminPassword;
     }
 
-    private void setUserPassword(String userPassword) {
+    public void setUserPassword(String userPassword) {
         if(passwordIsValid(userPassword)) this.userPassword = userPassword;
     }
 //this should be public and static i guess to work?
@@ -255,9 +259,9 @@ public class ManagementSystem {
 
     //check if the password matches any mode
     public int checkAccess(String s){
-        if(s.equals(userPassword)) return 1;
-        if(s.equals(adminPassword)) return 2;
-        else return 0;
+        if(s.equals(userPassword)) return USER;
+        if(s.equals(adminPassword)) return ADMIN;
+        else return NOACCESS;
         //set mode?? boolean\
         //when exit admin mode / user mode --> display main menu;
     }
