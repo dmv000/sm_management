@@ -1,64 +1,81 @@
 public class DeviceTest {
     public static void main(String[] args) {
-        System.out.println("HI");
-        int []powerlvl = {50,100};
-        Appliance A1 = new Appliance(101, "Ac", 750, true,powerlvl, false);
-        Appliance A2 = new Appliance(170, "Ac", 700, true,powerlvl, true);
-        Appliance A3 = new Appliance(120, "Fan", 100, true,powerlvl, true);
+       // 1. Basic System & Password
+       // -------------we should include a way to organize many systems in one.
+       //like a list with ID for each system we select from it
+       //example system1 has ID 1 it goes to the location 0 i the array and retrieve it?
+        ManagementSystem system1 = new ManagementSystem("Admin123", "User1234");
+        System.out.println("admin password validating: " + system1.passwordIsValid("Admin123")); // Valid
+        System.out.println("user password validating: " + system1.passwordIsValid("User1234")); // Valid
+        System.out.println("invalid password validating: " + system1.passwordIsValid("111")); // Invalid
+
+        // 2. Add Rooms
+        Room Livingroom = new Room("Lr101", "Living Room");
+        Room Kitchen = new Room("Kch102", "Kitchen");
+        Room Bedroom = new Room("Br103", "Bedroom");
+        Room Bathroom = new Room("Bthr104", "Bathroom");
 
 
-        A1.turnOn(1);
+        //3. Add Devices
+        //add Lights
+        Light dimmableLight = new Light(01, "dimm1", 50, false, true);
+        Light non_dimmableLight = new Light(02, "nondimm2", 100, false, false);
+        Light crit_light = new Light(03, "critLight", 100, true, false);
 
-        Light L1 = new Light(150, "Light", 50, false, true);
-        Light L2 = new Light(200,"light",100,false,false);
-        L1.turnOn(50);
-        Room r1= new Room("L1", "Living Room");
-        Room r2 = new Room("K1","Kitchen");
-
-
-        System.out.println("yesyes");
-        ManagementSystem M1 = new ManagementSystem("123456Ab","123456Ba");
-        M1.addRoom(r1);
-        M1.addDevice(A1,r1);
-        //M1.addDevice(L1,r1);
-        System.out.println(M1.addDevice(L1,r1));
-        M1.addRoom(r2);
-        M1.addDevice(L1, r2);
-        M1.addDevice(A2,r2);
-        M1.addDevice(A3,r1);
-        M1.addDevice(L2,r1);
-        M1.turnOffDevice(A1);
-        M1.turnOnDevice("L1",100);
-        M1.shutDownAllDevices();
-        System.out.println(M1.checkTurnOnDevice(A1));
-        M1.turnOnAllLightsInHouse();
-        //M1.addDeviceToWaitingListDay(L1);
-        M1.addDeviceToWaitingListDay(L2);
-        M1.addDeviceToWaitingListDay(A1);
-        //M1.addDeviceToWaitingListPower(L1);
-        //M1.addDeviceToWaitingListPower(A1);
-        //M1.removeDeviceFromWaitingListDay(L1);
-        //M1.removeDeviceFromWaitingListPower(L1);
-        M1.setMaxAllowedPower(3000);
-        System.out.println("yyyyyyy");
-        System.out.println(M1.listStandByDayDevices());
-        //System.out.println(M1.listStandByPowerDevices());
-        //M1.setNoisyDeviceStatus(Device.ON);
-        //System.out.println(M1.turnOffDevice("L1",200));
-        //System.out.println(M1.turnOffDevice("K1",170));
-        //M1.shutDownAllDevices();
-        //System.out.println(M1.checkTurnOnDevice(A1));
-        //M1.turnOnDevice("L1",200);
-        //A1.turnOn(1);
-        System.out.println("nnnnnnnn");
-        System.out.println(M1.listStandByDayDevices());
-        System.out.println(M1.displaySummaryAllRooms());
-        M1.setDayTime();
-        System.out.println(M1.displaySummaryAllRooms());
-        System.out.println("yyyyyyy");
-        System.out.println(M1.listStandByDayDevices());
+        // APPLIANCES
+        int[] pLevels = {0, 25, 50, 75, 100};
+        Appliance tv = new Appliance(04, "SmartTV", )
+        // Add to rooms
 
 
+        //4. Device On/Off Tests
+        // Turn On/Off by room code and device id
+        // Dimmable light
+        //non-Dimmable light
+
+
+        // Set light to level
+
+
+        // Try to switch non-adjustable off (should ignore)
+
+
+        // Appliance on at level
+
+        //5. Waiting Lists and Noisy Devices
+        // At night: noisy device should not be allowed to run
+
+        // Add to day waiting list
+
+
+        // Simulate day time, should try to turn on noisy waiting devices
+
+
+        // === 6. Over Power Consumption Shut Off ===
+        // Washer ON
+        // TV ON
+        // Dimmable ON
+
+
+        // Reduce allowed power to test power waiting list
+        // Should not be allowed, check
+
+        // Restore
+
+
+        //7. Searches and Removals
+
+
+        //8. Summary and Detail Displays
+
+
+        //9. Group Operations
+
+
+        //10. Standby Lists (Final Listing)
+
+
+        //11. Access Check
 
     }
 }
