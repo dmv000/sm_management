@@ -37,8 +37,6 @@ public class DeviceTest {
                 adminMenu(scan);
             }
         }
-
-
     }
 
     private static void loginMenu(Scanner scan){
@@ -88,7 +86,16 @@ public class DeviceTest {
                 System.out.println(managementSystem.displayDetailsOneRoom(scan.nextLine()));
                 break;
             case 4:
-
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+            case 10:
+            case 11:
+            case 0:
+                role = 0;
+                break;
             default:
                 System.out.println("Invalid action");
         }
@@ -122,8 +129,28 @@ public class DeviceTest {
         int action = scan.nextInt();
         scan.nextLine(); //also to clear the buffer
         switch(action){
-           //case x:
-
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+            case 10:
+            case 11:
+            case 12:
+            case 13:
+            case 14:
+            case 15:
+            case 16:
+            case 17:
+            case 18:
+            case 19:
+            case 0:
+                role = 0;
+                break;
             default:
                 System.out.println("Invalid action");
         }
