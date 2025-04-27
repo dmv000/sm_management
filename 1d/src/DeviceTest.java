@@ -42,6 +42,7 @@ public class DeviceTest {
         System.out.println(M1.listStandByDayDevices());
         System.out.println(M1.listStandByPowerDevices());
         M1.setNoisyDeviceStatus(1);
+        System.out.println(M1.checkTurnOnDevice(A1));
         M1.turnOnDevice("L1",100);
 
         A1.turnOn(1);
