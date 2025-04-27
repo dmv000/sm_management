@@ -118,11 +118,14 @@ public class ManagementSystem {
 
     public boolean turnOnDevice(String roomCode, int deviceId){
         //check if roomCode is valid
-        if(searchRoomByCode(roomCode) == null) return false;
+        Room r = searchRoomByCode(roomCode);
+        if(r == null) return false;
         //check room if the device is present
-        for(int i = 0; i < searchRoomByCode(roomCode).getDevicesList().size(); i++){
-            if(searchRoomByCode(roomCode).getDevicesList().get(i).getId() == deviceId){
-                searchRoomByCode(roomCode).getDevicesList().get(i).turnOn();
+        for(int i = 0; i < r.getDevicesList().size(); i++){
+            if(r.getDevicesList().get(i).getId() == deviceId){
+                r.getDevicesList().get(i).turnOn();
+                removeDeviceFromWaitingListPower(r.getDevicesList().get(i));
+                removeDeviceFromWaitingListDay(r.getDevicesList().get(i));
                 return true;
             }
         }
@@ -243,7 +246,7 @@ public class ManagementSystem {
     private void tryToTurnOnDevicesPower(){
         if(waitingListPower.size() != 0){
             for(int i = 0; i < waitingListPower.size(); i++) {
-                if (waitingListPower.get(i).getCurrentConsumption() + getTotalPowerConsumption() < maxAllowedPower) {
+                if (waitingListPower.get(i).getCurrentConsumption() + getTotalPowerConsumption() <= maxAllowedPower) {
                     waitingListPower.get(i).turnOn();
                     waitingListPower.remove(waitingListPower.get(i));
                 }
@@ -295,7 +298,7 @@ public class ManagementSystem {
     }
 
     public void removeDeviceFromWaitingListDay(Device d){
-        waitingListDay.remove(d);
+        if(waitingListDay.contains(d)) waitingListDay.remove(d);
     }
 
     public String listStandByDayDevices(){
@@ -312,7 +315,7 @@ public class ManagementSystem {
     }
 
     public void removeDeviceFromWaitingListPower(Device d){
-        waitingListPower.remove(d);
+        if(waitingListPower.contains(d)) waitingListPower.remove(d);
     }
 
     public String listStandByPowerDevices(){

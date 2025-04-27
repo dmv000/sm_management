@@ -2,7 +2,7 @@ public class DeviceTest {
     public static void main(String[] args) {
         System.out.println("HI");
         int []powerlvl = {50,100};
-        Appliance A1 = new Appliance(100, "Ac", 750, true,powerlvl, false);
+        Appliance A1 = new Appliance(101, "Ac", 750, true,powerlvl, false);
         Appliance A2 = new Appliance(150, "Ac", 700, true,powerlvl, true);
         Appliance A3 = new Appliance(120, "Fan", 100, true,powerlvl, true);
 
@@ -28,7 +28,7 @@ public class DeviceTest {
         M1.addDevice(A3,r1);
         M1.addDevice(L2,r1);
         M1.turnOffDevice(A1);
-        M1.turnOnDevice("L1",100);
+        M1.turnOnDevice("L1",101);
         M1.shutDownAllDevices();
         System.out.println(M1.checkTurnOnDevice(A1));
         M1.turnOnAllLightsInHouse();
@@ -41,12 +41,12 @@ public class DeviceTest {
         System.out.println("yyyyyyy");
         System.out.println(M1.listStandByDayDevices());
         System.out.println(M1.listStandByPowerDevices());
-        M1.setNoisyDeviceStatus(1);
-        M1.turnOffDevice("L1",100);
+        M1.setNoisyDeviceStatus(Device.ON);
+        System.out.println(M1.turnOffDevice("L1",101));
         //System.out.println(M1.checkTurnOnDevice(A1));
         //M1.turnOnDevice("L1",100);
         //A1.turnOn(1);
-        System.out.println(M1.displaySummaryAllRooms());
+        //System.out.println(M1.displaySummaryAllRooms());
 
 
 
