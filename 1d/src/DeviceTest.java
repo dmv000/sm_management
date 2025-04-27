@@ -3,7 +3,7 @@ public class DeviceTest {
         System.out.println("HI");
         int []powerlvl = {50,100};
         Appliance A1 = new Appliance(101, "Ac", 750, true,powerlvl, false);
-        Appliance A2 = new Appliance(150, "Ac", 700, true,powerlvl, true);
+        Appliance A2 = new Appliance(170, "Ac", 700, true,powerlvl, true);
         Appliance A3 = new Appliance(120, "Fan", 100, true,powerlvl, true);
 
 
@@ -28,25 +28,35 @@ public class DeviceTest {
         M1.addDevice(A3,r1);
         M1.addDevice(L2,r1);
         M1.turnOffDevice(A1);
-        M1.turnOnDevice("L1",101);
+        M1.turnOnDevice("L1",100);
         M1.shutDownAllDevices();
         System.out.println(M1.checkTurnOnDevice(A1));
         M1.turnOnAllLightsInHouse();
-        M1.addDeviceToWaitingListDay(L1);
+        //M1.addDeviceToWaitingListDay(L1);
         M1.addDeviceToWaitingListDay(L2);
-        M1.addDeviceToWaitingListPower(L1);
-        M1.addDeviceToWaitingListPower(A1);
-        M1.removeDeviceFromWaitingListDay(L1);
-        M1.removeDeviceFromWaitingListPower(L1);
+        M1.addDeviceToWaitingListDay(A1);
+        //M1.addDeviceToWaitingListPower(L1);
+        //M1.addDeviceToWaitingListPower(A1);
+        //M1.removeDeviceFromWaitingListDay(L1);
+        //M1.removeDeviceFromWaitingListPower(L1);
+        M1.setMaxAllowedPower(3000);
         System.out.println("yyyyyyy");
         System.out.println(M1.listStandByDayDevices());
-        System.out.println(M1.listStandByPowerDevices());
-        M1.setNoisyDeviceStatus(Device.ON);
-        System.out.println(M1.turnOffDevice("L1",101));
+        //System.out.println(M1.listStandByPowerDevices());
+        //M1.setNoisyDeviceStatus(Device.ON);
+        //System.out.println(M1.turnOffDevice("L1",200));
+        //System.out.println(M1.turnOffDevice("K1",170));
+        //M1.shutDownAllDevices();
         //System.out.println(M1.checkTurnOnDevice(A1));
-        //M1.turnOnDevice("L1",100);
+        //M1.turnOnDevice("L1",200);
         //A1.turnOn(1);
-        //System.out.println(M1.displaySummaryAllRooms());
+        System.out.println("nnnnnnnn");
+        System.out.println(M1.listStandByDayDevices());
+        System.out.println(M1.displaySummaryAllRooms());
+        M1.setDayTime();
+        System.out.println(M1.displaySummaryAllRooms());
+        System.out.println("yyyyyyy");
+        System.out.println(M1.listStandByDayDevices());
 
 
 
