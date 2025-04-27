@@ -11,8 +11,6 @@ public class ManagementSystem {
     public final static int NORMAL = 4000;
     public final static int HIGH = 10000;
     //3 access Levels
-    //ma ba3ref eddeh ma32oul yfidoune :p
-
     public final static int NOACCESS = 0;
     public final static int USER = 1;
     public final static int ADMIN = 2;
