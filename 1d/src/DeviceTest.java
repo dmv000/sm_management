@@ -2,6 +2,7 @@ import java.util.Scanner;
 public class DeviceTest {
     private static ManagementSystem managementSystem;
     //0 = not logged in; 1 = logged in; 2 = admin log in
+    //this is a method in managementsystem class
     private static int role = 0;
 
     public static void main(String[] args) {
@@ -73,6 +74,8 @@ public class DeviceTest {
         int action = scan.nextInt();
         scan.nextLine(); //this to clear the buffer for the next action to be made
 
+        //switch case for a clean dashboard experience in the terminal
+        //includes all the methods and their actions
         switch(action){
             case 1:
                 System.out.println("Enter your new password:");
@@ -86,12 +89,34 @@ public class DeviceTest {
                 System.out.println(managementSystem.displayDetailsOneRoom(scan.nextLine()));
                 break;
             case 4:
+                System.out.println(managementSystem.listStandByDayDevices());
+                break;
             case 5:
+                System.out.println(managementSystem.listStandByPowerDevices());
+                break;
             case 6:
+                managementSystem.setDayTime();
+                break;
             case 7:
+                managementSystem.setNightTime();
+                break;
             case 8:
+                System.out.println("Enter the room code you want to turn on the device in: ");
+                String roomC = scan.nextLine();
+                System.out.println("Enter the device id you want to turn on: ");
+                int devId = scan.nextInt();
+                scan.nextLine();
+                managementSystem.turnOnDevice(roomC, devId);
+                break;
             case 9:
+                System.out.println("Enter the room code you want to turn off the device in: ");
+                String roomC1 = scan.nextLine();
+                System.out.println("Enter the device id you want to turn off: ");
+                int devId1 = scan.nextInt();
+                scan.nextLine();
+                break;
             case 10:
+
             case 11:
             case 0:
                 role = 0;
