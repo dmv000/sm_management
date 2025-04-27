@@ -24,7 +24,10 @@ public class DeviceTest {
 
         // APPLIANCES
         int[] pLevels = {0, 25, 50, 75, 100};
-        Appliance tv = new Appliance(04, "SmartTV", );
+        Appliance tv = new Appliance(04, "SmartTV", 200, pLevels, false);
+        Appliance washingMachine = new Appliance(05, "washigMachine", 600, new int[]{0, 75, 100}, true);
+
+
         // Add to rooms
 
 
