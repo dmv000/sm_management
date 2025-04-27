@@ -24,7 +24,7 @@ public class DeviceTest {
 
         // APPLIANCES
         int[] pLevels = {0, 25, 50, 75, 100};
-        Appliance tv = new Appliance(04, "SmartTV", )
+        Appliance tv = new Appliance(04, "SmartTV", );
         // Add to rooms
 
 
