@@ -55,7 +55,7 @@ public class DeviceTest {
     }
 
     /**
-     *1. Check all rooms info
+     * 1. Check all rooms info
      * 2. Check all devices info
      * 3. Check all running devices
      * 4. Check all standby devices in the day waiting list
@@ -65,9 +65,10 @@ public class DeviceTest {
      * 8. Turn on/ Turn off a device
      * 9. Turn off all devices from one specific room!!!!
      * 10. Turn off all devices in the house!!!!
-     * 11. Check current power consumption
-     * 12. Set day/night mode
-     * 13. Exit control mode
+     * 11. if device is critical prompt the admin password
+     * 12. Check current power consumption
+     * 13. Set day/night mode
+     * 14. Exit control mode
      *
      */
     private static void userMenu(Scanner scan){
@@ -183,15 +184,63 @@ public class DeviceTest {
         scan.nextLine(); //also to clear the buffer
         switch(action){
             case 1:
+                System.out.println("Enter your new admin password: ");
+                managementSystem.changeAdminPassword(scan.nextLine());
+                break;
             case 2:
+                System.out.println("Enter your new user password: ");
+                managementSystem.changeUserPassword(scan.nextLine());
+                break;
             case 3:
+                /**
+                 * maxPower consumption?
+                 */
             case 4:
+                System.out.println("Enter the room code to remove: ");
+                String code = scan.nextLine();
+                Room roomToRemove = managementSystem.searchRoomByCode(code);
+                managementSystem.removeRooms(roomToRemove);
+                break;
             case 5:
+                /**
+                 * isCritical
+                 * maxPower consumption
+                 * Is this device an Appliance or a Light?
+                 * if light (adjustable or no)
+                 * appliance noisy?
+                 */
             case 6:
+                System.out.println("Enter the device id to remove: ");
+                int deviceId = scan.nextInt();
+                scan.nextLine();
+                Device deviceToRemove = managementSystem.searchDeviceById(deviceId);
+                managementSystem.removeDevice(deviceToRemove);
+                break;
             case 7:
+                System.out.println(managementSystem.displaySummaryAllRooms());
+                break;
             case 8:
+                System.out.println("Enter the room code for details: ");
+                System.out.println(managementSystem.displayDetailsOneRoom(scan.nextLine()));
+                break;
             case 9:
+                System.out.println("Enter the max allowed power (1 = low, 2= normal, 3 = high)");
+                int mPower = scan.nextInt();
+                scan.nextLine();
+                if(mPower == 1){
+                    managementSystem.maxAllowedPower = managementSystem.LOW;
+                }
+                else if(mPower == 2){
+                    managementSystem.maxAllowedPower = managementSystem.NORMAL;
+                }else{
+                    managementSystem.maxAllowedPower = managementSystem.HIGH;
+                }
+                break;
             case 10:
+                System.out.println("Enter room code to shutDown");
+                Room targetRoom = managementSystem.searchRoomByCode(scan.nextLine());
+                managementSystem.shutDownOneRoom(targetRoom);
+                break;
             case 11:
             case 12:
             case 13:

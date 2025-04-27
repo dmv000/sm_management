@@ -5,7 +5,7 @@ public class ManagementSystem {
     private String adminPassword; //size >= 8 //1 upper case,1 lower, 1 digit at least
     private String userPassword; //same as admin
     private ArrayList<Room> rooms;
-    private double maxAllowedPower;
+    protected double maxAllowedPower; //?
     //3 power modes
     public final static int LOW = 1000;
     public final static int NORMAL = 4000;
