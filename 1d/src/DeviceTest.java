@@ -48,5 +48,7 @@ public class DeviceTest {
         A1.turnOn(1);
         System.out.println(M1.displaySummaryAllRooms());
 
+
+
     }
 }
