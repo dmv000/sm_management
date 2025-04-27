@@ -12,7 +12,7 @@ public class ManagementSystem {
     public final static int HIGH = 10000;
     //3 access Levels
     //ma ba3ref eddeh ma32oul yfidoune :p
-    //hayde bas variable ana bhetta kermel el if stat w el access
+
     public final static int NOACCESS = 0;
     public final static int USER = 1;
     public final static int ADMIN = 2;
