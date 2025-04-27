@@ -69,19 +69,36 @@ public class ManagementSystem {
         return null;
     }
 
-    public void addRoom(Room r){
+    public boolean addRoom(Room r){
+        //check if the added room has the same id to prevent code duplicates
+        for(Room room : rooms){
+            if(r.getCode().equals(r.getCode())) return false;
+        }
         rooms.add(r);
+        return true;
     }
+    //returns false if another room has the same code;
 
-    public boolean addDevice(Device d, Room r){
+    public int addDevice(Device d, Room r){
+        //check if anoother device has the same id in this room or another >> to prevent id duplicates
+        //(other methods deal with devices using an id basis)
+        for(Room room : rooms){
+            for(Device device :room.getDevicesList()){
+                if(device.equals(d)) return 2;
+            }
+        }
+        //check if room is present
         for(Room room : rooms){
             if(room.equals(r)){
                 room.addDevice(d);
-                return true;
+                return 0;
             }
         }
-        return false;
+        return 1;
     }
+    //return 0 if added correctly
+    //return 1 if room is not present
+    //return 2 if device id is already used
 
     public boolean removeRooms(Room r){
         if(!rooms.contains(r)) return false;
