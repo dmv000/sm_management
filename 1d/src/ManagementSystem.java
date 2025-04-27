@@ -32,10 +32,11 @@ public class ManagementSystem {
     private void setUserPassword(String userPassword) {
         if(passwordIsValid(userPassword)) this.userPassword = userPassword;
     }
-//this should be public i guess to work?
-    public boolean passwordIsValid(String s){
+//this should be public and static i guess to work?
+    public static boolean passwordIsValid(String s){
         boolean isUpper = false, isLower = false, isDigit = false;
         if(s.length() < 8) return false;
+
         for(int i = 0; i < s.length(); i++){
             if(Character.isUpperCase(s.charAt(i))) isUpper = true;
             if(Character.isLowerCase(s.charAt(i))) isLower = true;
