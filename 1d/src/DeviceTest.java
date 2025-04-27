@@ -28,6 +28,15 @@ public class DeviceTest {
         managementSystem = new ManagementSystem(adminPwd, userPwd);
 
         //Roles admin/user/exit to main menu
+        while(true){
+            if(role == 0){
+                loginMenu(scan);
+            }else if(role == 1){
+                userMenu(scan);
+            }else{
+                adminMenu(scan);
+            }
+        }
 
 
     }
@@ -48,7 +57,7 @@ public class DeviceTest {
 
     private static void userMenu(Scanner scan){
         System.out.println(
-                "\n===== USER MENU =====\n" +
+                "\n User Menu: \n" +
                         "1. Change My Password\n" +
                         "2. Display Summary of All Rooms\n" +
                         "3. Display Details of One Room\n" +
@@ -67,7 +76,56 @@ public class DeviceTest {
         scan.nextLine(); //this to clear the buffer for the next action to be made
 
         switch(action){
-            case ?;
+            case 1:
+                System.out.println("Enter your new password:");
+                managementSystem.changeUserPassword(scan.nextLine());
+                break;
+            case 2:
+                System.out.println(managementSystem.displaySummaryAllRooms());
+                break;
+            case 3:
+                System.out.println("Enter the room code: ");
+                System.out.println(managementSystem.displayDetailsOneRoom(scan.nextLine()));
+                break;
+            case 4:
+
+            default:
+                System.out.println("Invalid action");
+        }
+    }
+
+    private static void adminMenu(Scanner scan){
+        System.out.println(
+                "\n Admin Menu: \n" +
+                        "1. Change My Password\n" +
+                        "2. Change User Password\n" +
+                        "3. Add Room\n" +
+                        "4. Remove Room\n" +
+                        "5. Add Device to Room\n" +
+                        "6. Remove Device\n" +
+                        "7. Display Summary of All Rooms\n" +
+                        "8. Display Details of One Room\n" +
+                        "9. Set Max Allowed Power\n" +
+                        "10. Shut Down Room\n" +
+                        "11. Shut Down All Devices\n" +
+                        "12. List Standby Devices (Day)\n" +
+                        "13. List Standby Devices (Power)\n" +
+                        "14. Turn ON a Device\n" +
+                        "15. Turn OFF a Device\n" +
+                        "16. Turn ON all Lights\n" +
+                        "17. Search Room by Code\n" +
+                        "18. Search Device by ID\n" +
+                        "19. Display System Info\n" +
+                        "0. Logout"
+        );
+        System.out.print("Select: ");
+        int action = scan.nextInt();
+        scan.nextLine(); //also to clear the buffer
+        switch(action){
+           //case x:
+
+            default:
+                System.out.println("Invalid action");
         }
     }
 
