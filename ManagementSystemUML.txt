@@ -46,8 +46,8 @@
 | + setNoisyDeviceStatus(newStatus: int): void             | // Changes status of all noisy devices
 | + addDeviceToWaitingListDay(d: Device): void             | // Adds device to day standby list
 | + RemoveDeviceFromWaitingListDay(d: Device): void        | // Removes device from day standby list
-| + listStandByDayDevices(): String                        | // Lists devices waiting for daytime
+| + listStandByDayDevices(): String                        | // Lists devices waiting for daytime       //returning only ids not the object
 | + addDeviceToWaitingListPower(d: Device): void           | // Adds device to power standby list
 | + RemoveDeviceFromWaitingListPower(d: Device): void      | // Removes device from power standby list
-| + listStandByPowerDevices(): String                      | // Lists devices waiting for enough power
+| + listStandByPowerDevices(): String                      | // Lists devices waiting for enough power      //returning only ids not the object
 +----------------------------------------------------------+
