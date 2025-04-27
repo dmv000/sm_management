@@ -54,6 +54,22 @@ public class DeviceTest {
         }
     }
 
+    /**
+     *1. Check all rooms info
+     * 2. Check all devices info
+     * 3. Check all running devices
+     * 4. Check all standby devices in the day waiting list
+     * 5. Check all standby devices in the power waiting list
+     * 6. Search for a given room
+     * 7. Search for a given device
+     * 8. Turn on/ Turn off a device
+     * 9. Turn off all devices from one specific room!!!!
+     * 10. Turn off all devices in the house!!!!
+     * 11. Check current power consumption
+     * 12. Set day/night mode
+     * 13. Exit control mode
+     *
+     */
     private static void userMenu(Scanner scan){
         System.out.println(
                 "\n User Menu: \n" +
@@ -116,8 +132,11 @@ public class DeviceTest {
                 scan.nextLine();
                 break;
             case 10:
-
+                managementSystem.turnOnAllLightsInHouse();
+                break;
             case 11:
+                System.out.println(managementSystem.displayInfo());
+                break;
             case 0:
                 role = 0;
                 break;
@@ -126,6 +145,15 @@ public class DeviceTest {
         }
     }
 
+    /**
+     * 1. Change admin and user passwords
+     * 2. Change power mode to one of the three possible modes
+     * 3. Set day/time mode
+     * 4. Add/Delete/Search a room
+     * 5. Add/Delete/Search a device
+     * 6. Exit admin mode
+     *
+     */
     private static void adminMenu(Scanner scan){
         System.out.println(
                 "\n Admin Menu: \n" +
