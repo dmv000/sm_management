@@ -40,6 +40,7 @@ public class DeviceTest {
         }
     }
 
+    //This prompt the method checkAccess to define admin/user role
     private static void loginMenu(Scanner scan){
         System.out.println("Welcome to your House Management System");
         System.out.println("Please enter the User or Admin password (or x to exit): ");
@@ -65,7 +66,7 @@ public class DeviceTest {
      * 8. Turn on/ Turn off a device
      * 9. Turn off all devices from one specific room!!!!
      * 10. Turn off all devices in the house!!!!
-     * 11. if device is critical prompt the admin password
+     * 11. if device is critical prompt the admin password!!!
      * 12. Check current power consumption
      * 13. Set day/night mode
      * 14. Exit control mode
