@@ -2,7 +2,7 @@ import java.util.Scanner;
 public class DeviceTest {
     private static ManagementSystem managementSystem;
     //0 = not logged in; 1 = logged in; 2 = admin log in
-    //this is a method in managementsystem class
+    //(role) is a method in managementsystem class
     private static int role = 0;
 
     public static void main(String[] args) {
@@ -41,7 +41,7 @@ public class DeviceTest {
     }
 
     private static void loginMenu(Scanner scan){
-        System.out.println("Welcome to your House Management System: ");
+        System.out.println("Welcome to your House Management System");
         System.out.println("Please enter the User or Admin password (or x to exit): ");
         String pswd = scan.nextLine();
 
@@ -179,30 +179,32 @@ public class DeviceTest {
                         "19. Display System Info\n" +
                         "0. Logout"
         );
-        System.out.print("Select: ");
+        System.out.print("Select action: ");
         int action = scan.nextInt();
         scan.nextLine(); //also to clear the buffer
         switch(action){
             case 1:
-                System.out.println("Enter your new admin password: ");
+                System.out.println("Enter your new admin password");
                 managementSystem.changeAdminPassword(scan.nextLine());
                 break;
             case 2:
-                System.out.println("Enter your new user password: ");
+                System.out.println("Enter your new user password");
                 managementSystem.changeUserPassword(scan.nextLine());
                 break;
             case 3:
                 /**
+                 * Add Room
                  * maxPower consumption?
                  */
             case 4:
-                System.out.println("Enter the room code to remove: ");
+                System.out.println("Enter the room code to remove");
                 String code = scan.nextLine();
                 Room roomToRemove = managementSystem.searchRoomByCode(code);
                 managementSystem.removeRooms(roomToRemove);
                 break;
             case 5:
                 /**
+                 *      Add Device
                  * isCritical
                  * maxPower consumption
                  * Is this device an Appliance or a Light?
@@ -210,7 +212,7 @@ public class DeviceTest {
                  * appliance noisy?
                  */
             case 6:
-                System.out.println("Enter the device id to remove: ");
+                System.out.println("Enter the device id to remove");
                 int deviceId = scan.nextInt();
                 scan.nextLine();
                 Device deviceToRemove = managementSystem.searchDeviceById(deviceId);
@@ -220,7 +222,7 @@ public class DeviceTest {
                 System.out.println(managementSystem.displaySummaryAllRooms());
                 break;
             case 8:
-                System.out.println("Enter the room code for details: ");
+                System.out.println("Enter the room code for details");
                 System.out.println(managementSystem.displayDetailsOneRoom(scan.nextLine()));
                 break;
             case 9:
@@ -242,14 +244,45 @@ public class DeviceTest {
                 managementSystem.shutDownOneRoom(targetRoom);
                 break;
             case 11:
+                managementSystem.shutDownAllDevices();
+                break;
             case 12:
+                System.out.println(managementSystem.listStandByDayDevices());
+                break;
             case 13:
+                System.out.println(managementSystem.listStandByPowerDevices());
+                break;
             case 14:
+                System.out.println("enter room code and device id respectively to turn on");
+                String roomC2 = scan.nextLine();
+                int devId2 = scan.nextInt();
+                scan.nextLine();
+                managementSystem.turnOnDevice(roomC2, devId2);
+                break;
             case 15:
+                System.out.println("enter room code and device id respectively to turn off");
+                String roomC3 = scan.nextLine();
+                int devId3 = scan.nextInt();
+                scan.nextLine();
+                managementSystem.turnOffDevice(roomC3, devId3);
+                break;
             case 16:
+                managementSystem.turnOnAllLightsInHouse();
+                break;
             case 17:
+                System.out.println("enter room code to search for it");
+                String roomC4 = scan.nextLine();
+                System.out.println(managementSystem.searchRoomByCode(roomC4));
+                break;
             case 18:
+                System.out.println("enter device id to search for it");
+                int devId4 = scan.nextInt();
+                scan.nextLine();
+                System.out.println(managementSystem.searchDeviceById(devId4));
+                break;
             case 19:
+                System.out.println(managementSystem.displayInfo());
+                break;
             case 0:
                 role = 0;
                 break;
