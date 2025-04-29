@@ -372,7 +372,6 @@ public class ManagementSystem {
     }
 
     public void addDeviceToWaitingListPower(Device d){
-        //todo no uses
         d.setStatus(Device.STANDBY);
         waitingListPower.add(d);
     }
