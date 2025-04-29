@@ -144,11 +144,11 @@ public class DrHamidTester {
                 //todo Under construction!
 
             //on
-                            //todo check use managementSystem.checkTurnOnDevice()
-                            //todo if appliance --> turnOn() or turnOn(currentLEvel)
+                            //check use managementSystem.checkTurnOnDevice()
+                            // if appliance --> turnOn() or turnOn(currentLEvel)
                             // display the powerLevels array and give the user a choice form one of them
                             //  the inputted choice should be between 0 and the length of the array(index)
-                            //todo if light --> turnOn(level) -- between 0 and 100 >> give a choice
+                            // if light --> turnOn(level) -- between 0 and 100 >> give a choice
                             // inputted choice is the number
                             //0 -> no constraints
                             //turn on
@@ -159,8 +159,8 @@ public class DrHamidTester {
                             //2 -> not enough power --> waitlist / cancel (ask user)
                             //addDeviceToWaitingListPower();
                             //exit
-                            //todo checkTurnOnDevice
-                            //todo then in its night prompt if you want to turn on or add to waitinglist
+                            //checkTurnOnDevice
+                            //then in its night prompt if you want to turn on or add to waitinglist
             case 9:
                 // Turn off all devices from one specific room
                 System.out.println("Enter room code to turn off all devices: ");
@@ -170,16 +170,18 @@ public class DrHamidTester {
                     System.out.print("Critical device/s detected in the room. Please enter the admin password to proceed: ");
                     String adminPassword = scan.nextLine();
                     int accessLevel = managementSystem.checkAccess(adminPassword);
-                    if (accessLevel == 2) {
+                    if (accessLevel == ManagementSystem.ADMIN) {
                         managementSystem.shutDownAllDevices();
-                        System.out.println("All devices in the house have been turned off.");
+                        System.out.println("All devices in the room have been turned off.");
                     } else {
-                        System.out.println("Incorrect admin password. Action denied.");
+                        managementSystem.shutDownOneRoom(foundRoom);
+                        managementSystem.setRoomCriticalDeviceStatus(foundRoom, Device.ON);
+                        System.out.println("Incorrect admin password. " +
+                                "Only non critical devices in the room have been turned off");
                     }
                 }else{
                     managementSystem.shutDownOneRoom(foundRoom);
                 }
-                // todo do we need to check for critical devices??? done
                 break;
             case 10:
                 // Turn off all devices in the house
@@ -187,14 +189,17 @@ public class DrHamidTester {
                     System.out.print("Critical device/s detected in the house. Please enter the admin password to proceed: ");
                     String adminPassword = scan.nextLine();
                     int accessLevel = managementSystem.checkAccess(adminPassword);
-                    if (accessLevel == 2) {
+                    if (accessLevel == ManagementSystem.ADMIN) {
                         managementSystem.shutDownAllDevices();
                         System.out.println("All devices in the house have been turned off.");
                     } else {
-                        System.out.println("Incorrect admin password. Action denied.");
+                        managementSystem.shutDownAllDevices();
+                        managementSystem.setAllCriticalDeviceStatus(Device.ON);
+                        System.out.println("Incorrect admin password! Only non-critical devices have been turned off.");
                     }
                 }else{
-                    managementSystem.shutDownAllDevices();}
+                    managementSystem.shutDownAllDevices();
+                }
                 break;
                 //todo do we need to check for critical devices??? done
                 //if checkAllRoomsForCriticalDevice() prompt the admin password and use setAllCriticalDeviceStatus() done
@@ -227,7 +232,6 @@ public class DrHamidTester {
                         scan.nextLine();
                     }
                 }
-                //todo what if other than 1 or 0 is inputed? done
                 break;
             case 13:
                 role = 0;
