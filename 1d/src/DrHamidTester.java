@@ -209,28 +209,7 @@ public class DrHamidTester {
                 break;
             case 12:
                 //Set day/night mode
-                int timeMode = -1;
-                while (true) {
-                    System.out.print("Set day/night mode (1 = Day, 0 = Night): ");
-                    if (scan.hasNextInt()) {
-                        timeMode = scan.nextInt();
-                        scan.nextLine();
-                        if (timeMode == 1) {
-                            managementSystem.setDayTime();
-                            System.out.println("Mode updated to Day.");
-                            break;
-                        } else if (timeMode == 0) {
-                            managementSystem.setNightTime();
-                            System.out.println("Mode updated to Night.");
-                            break;
-                        } else {
-                            System.out.println("Invalid input. Please enter 1 for Day or 0 for Night.");
-                        }
-                    } else {
-                        System.out.println("Invalid input. Please enter a valid number (1 for Day or 0 for Night).");
-                        scan.nextLine();
-                    }
-                }
+                setDayNightMode();
                 break;
             case 13:
                 role = 0;
@@ -292,46 +271,7 @@ public class DrHamidTester {
                 break;
             case 3:
                 // Set day time mode
-                System.out.print("Set mode 1 to Day or 2 to Night: ");
-                int dayNight = scan.nextInt();
-                scan.nextLine();
-                if (dayNight == 1) {
-                    managementSystem.setDayTime();
-                    System.out.println("System set to day mode.");
-                }else if (dayNight == 2) {
-                    managementSystem.setNightTime();
-                    if (managementSystem.checkForRunningNoisyDevices()){
-                        System.out.println("It is night! Noisy devices detected!");
-                        System.out.println("Choose an option: ");
-                        System.out.println("1. Keep the devices on anyways");
-                        System.out.println("2. Add the devices to the day waitlist");
-                        System.out.println("3. Turn the noisy devices off");
-                        switch(scan.nextInt()){
-                            case 1:
-                                System.out.println("Noisy devices kept on");
-                                managementSystem.setNightTime();
-                                System.out.println("It is night!");
-                                break;
-                            case 2:
-                                managementSystem.addNoisyDevicesToWaitingListDay();
-                                System.out.println("Noisy devices added to waitlist");
-                                managementSystem.setNightTime();
-                                System.out.println("It is night!");
-                                break;
-                            case 3:
-                                managementSystem.setNoisyDeviceStatus(Device.OFF);
-                                managementSystem.setNightTime();
-                                System.out.println("Noisy devices turned off");
-                                break;
-                            default:
-                                System.out.println("Invalid Option");
-                                break;
-                        }
-                    }
-                    System.out.println("System set to night mode.");
-                }else {
-                    System.out.println("Invalid input.");
-                }
+                setDayNightMode();
                 break;
             case 4:
                 // Add/Delete/Search a room
@@ -456,6 +396,48 @@ public class DrHamidTester {
         }
     }
 
+    public static void setDayNightMode(){
+        System.out.print("Set mode 1 to Day or 2 to Night: ");
+        int dayNight = scan.nextInt();
+        scan.nextLine();
+        if (dayNight == 1) {
+            managementSystem.setDayTime();
+            System.out.println("System set to day mode.");
+        }else if (dayNight == 2) {
+            managementSystem.setNightTime();
+            if (managementSystem.checkForRunningNoisyDevices()){
+                System.out.println("It is night! Noisy devices detected!");
+                System.out.println("Choose an option: ");
+                System.out.println("1. Keep the devices on anyways");
+                System.out.println("2. Add the devices to the day waitlist");
+                System.out.println("3. Turn the noisy devices off");
+                switch(scan.nextInt()){
+                    case 1:
+                        System.out.println("Noisy devices kept on");
+                        managementSystem.setNightTime();
+                        System.out.println("It is night!");
+                        break;
+                    case 2:
+                        managementSystem.addNoisyDevicesToWaitingListDay();
+                        System.out.println("Noisy devices added to waitlist");
+                        managementSystem.setNightTime();
+                        System.out.println("It is night!");
+                        break;
+                    case 3:
+                        managementSystem.setNoisyDeviceStatus(Device.OFF);
+                        managementSystem.setNightTime();
+                        System.out.println("Noisy devices turned off");
+                        break;
+                    default:
+                        System.out.println("Invalid Option");
+                        break;
+                }
+            }
+            System.out.println("System set to night mode.");
+        }else {
+            System.out.println("Invalid input.");
+        }
+    }
 }
 
 //noisy setNoisyDevicesStasus
