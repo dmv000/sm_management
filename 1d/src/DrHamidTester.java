@@ -365,7 +365,7 @@ public class DrHamidTester {
                 }
                 break;
 
-            case 0:
+            case 6:
                 role = 0;
                 break;
             default:
