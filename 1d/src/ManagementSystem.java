@@ -339,7 +339,7 @@ public class ManagementSystem {
     }
 
     //standby methods (add, remove, display)
-    private void addDeviceToWaitingListDay(Device d){
+    public void addDeviceToWaitingListDay(Device d){
         d.setStatus(Device.STANDBY);
         waitingListDay.add(d);
     }

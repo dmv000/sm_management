@@ -41,21 +41,6 @@ public class DrHamidTester {
             }
         }
     }
-//------variables test
-    String roomCode = null;
-    String roomDescription = null;
-    Room foundRoom = null;
-    Room targetRoom = null;
-    Room roomToRemove = null;
-
-    int deviceId = 0;
-    String deviceName = null;
-    double devicePower = 0.0;
-    Device deviceInstance = null;
-    Device deviceToRemove = null;
-
-    int powerLevelChoice = 0;
-
     //This prompt the method checkAccess to define admin/user role
     private static void loginMenu() {
         System.out.println("Please enter the Contol or Admin password (or x to exit): ");
@@ -123,9 +108,9 @@ public class DrHamidTester {
                 System.out.print("Enter room code: ");
                 String roomCode = scan.nextLine();
                 Room foundRoom = managementSystem.searchRoomByCode(roomCode);
-                if (foundRoom != null) {
+                if(foundRoom != null){
                     System.out.println(foundRoom);
-                } else {
+                }else{
                     System.out.println("Room not found.");
                 }
                 break;
@@ -135,17 +120,112 @@ public class DrHamidTester {
                 int deviceId = scan.nextInt();
                 scan.nextLine();
                 Device foundDevice = managementSystem.searchDeviceById(deviceId);
-                if (foundDevice != null) {
+                if(foundDevice != null){
                     System.out.println(foundDevice);
-                } else {
+                }else{
                     System.out.println("Device not found.");
                 }
                 break;
             case 8:
-                // Turn on/ Turn off a device
-                //todo Under construction!
+                //Turn on / Turn off a device
+                System.out.print("Enter room code: ");
+                roomCode = scan.nextLine();
+                Room room = managementSystem.searchRoomByCode(roomCode);
+                if(room == null){
+                    System.out.println("Room not found.");
+                    break;
+                }
 
-            //on
+                System.out.print("Enter device ID: ");
+                deviceId = scan.nextInt();
+                scan.nextLine();
+                Device device = room.searchDeviceById(deviceId);
+                if(device == null){
+                    System.out.println("Device not found.");
+                    break;
+                }
+
+                System.out.print("Turn ON (1) or OFF (2)? ");
+                action = scan.nextInt();
+                scan.nextLine();
+                // Turn OFF
+                if(action == 2){
+                    if (device.isCritical()) {
+                        System.out.print("this device is critical please enter admin password to proceed: ");
+                        String adminPwd = scan.nextLine();
+                        if (!ManagementSystem.passwordIsValid(adminPwd)) {
+                            System.out.println("Invalid admin password. Cannot turn off critical device.");
+                            break;
+                        }
+                    }
+                    //this is to check and edit the device on/off
+                    boolean offResult = managementSystem.turnOffDevice(roomCode, deviceId);
+                    System.out.println(offResult ? "Device turned off." : "Failed to turn off device.");
+                    break;
+                // Turn ON
+                }else if(action == 1){
+                    int level = -1;
+                    boolean customLevel = false;
+
+                    if(device instanceof Appliance){
+                        Appliance app = (Appliance) device;
+                        int[] levels = app.getPowerLevels();
+                        System.out.print("Available power levels: ");
+                        for (int i = 0; i < levels.length; i++) {
+                            System.out.print(levels[i] + " ");
+                        }
+                        System.out.print("\nSelect power level: ");
+                        level = scan.nextInt();
+                        scan.nextLine();
+                        customLevel = true;
+                    }else if(device instanceof Light && ((Light) device).isAdjustable()){
+                        System.out.print("Enter brightness level: ");
+                        level = scan.nextInt();
+                        scan.nextLine();
+                        customLevel = true;
+                    }
+                    int check = managementSystem.checkTurnOnDevice(device);
+
+                    //noisy and night
+                    if(check == 1){
+                        System.out.println("the device is noisy and cannot be turned on at night.");
+                        System.out.print("do you want to add to waiting list for day? (Y/N): ");
+                        if (scan.nextLine().trim().equalsIgnoreCase("Y")) {
+                            managementSystem.addDeviceToWaitingListDay(device);
+                            System.out.println("Device added to waiting list for day.");
+                        }
+                        break;
+                        //power waiting list
+                    } else if (check == 2) {
+                        System.out.println("there is not enough power to turn on device.");
+                        System.out.print("do you want to add to waiting list for power? (Y/N): ");
+                        if (scan.nextLine().trim().equalsIgnoreCase("Y")) {
+                            managementSystem.addDeviceToWaitingListPower(device);
+                            System.out.println("Device added to waiting list for power.");
+                        }
+                        break;
+                    }
+
+                    boolean onResult;
+                    // If a power/brightness level was selected, use turnOn from Device
+                    if(customLevel) {
+                        if(device instanceof Appliance)
+                            ((Appliance) device).turnOn(level);
+                        else if(device instanceof Light)
+                            ((Light) device).turnOn(level);
+                        onResult = true;
+                    }else{
+                        onResult = managementSystem.turnOnDevice(roomCode, deviceId);
+                    }
+
+                    System.out.println(onResult ? "Device turned on." : "Failed to turn on device.");
+                    break;
+                }
+                System.out.println("Invalid option.");
+                break;
+
+
+            // todo Turn on / Turn off a device done
                             //check use managementSystem.checkTurnOnDevice()
                             // if appliance --> turnOn() or turnOn(currentLEvel)
                             // display the powerLevels array and give the user a choice form one of them
@@ -469,14 +549,3 @@ public class DrHamidTester {
         }
     }
 }
-
-//noisy setNoisyDevicesStasus
-//critical
-//power levels
-//max power consumption
-//device id
-//device name
-//room code
-//turn on/turn off
-//turn off all devices in the house
-//turn off all devices from one specific room
