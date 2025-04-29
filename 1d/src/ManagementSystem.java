@@ -221,7 +221,15 @@ public class ManagementSystem {
     }
 
     public String displayInfo(){
-        //to be implemented
+        StringBuilder sb = new StringBuilder();
+        sb.append("Time = " + day + "\n");
+        sb.append("Max allowed power = " + maxAllowedPower + "\n");
+        for(Room room : rooms){
+            sb.append("Room code " + room.getCode() + ":\n");
+            for(Device d : room.getDevicesList()){
+                sb.append(d.toString() +"\n");
+            }
+        }
         return "";
     }
 
@@ -288,7 +296,6 @@ public class ManagementSystem {
     }
 
     public boolean checkForRunningNoisyDevices(){
-        //todo no uses
         for(int i = 0; i < rooms.size(); i++){
             for(int j = 0; j < rooms.get(i).getDevicesList().size(); j++){
                 if(rooms.get(i).getDevicesList().get(j) instanceof Appliance){
@@ -316,7 +323,6 @@ public class ManagementSystem {
 
     //set the newStatus for all noisy devices only
     public void setNoisyDeviceStatus(int newStatus){
-        //todo no uses
         for(int i = 0; i < rooms.size(); i++){
             for(int j = 0; j < rooms.get(i).getDevicesList().size(); j++){
                 if(rooms.get(i).getDevicesList().get(j) instanceof Appliance
@@ -332,11 +338,23 @@ public class ManagementSystem {
     }
 
     //standby methods (add, remove, display)
-    public void addDeviceToWaitingListDay(Device d){
-        //todo no uses
+    private void addDeviceToWaitingListDay(Device d){
         d.setStatus(Device.STANDBY);
         waitingListDay.add(d);
     }
+
+    public void addNoisyDevicesToWaitingListDay(){
+        for(int i = 0; i < rooms.size(); i++){
+            for(int j = 0; j < rooms.get(i).getDevicesList().size(); j++){
+                if(rooms.get(i).getDevicesList().get(j) instanceof Appliance){
+                    if(((Appliance) rooms.get(i).getDevicesList().get(j)).isNoisy()){
+                        addDeviceToWaitingListDay(rooms.get(i).getDevicesList().get(j));
+                    }
+                }
+            }
+        }
+    }
+
 
     private void removeDeviceFromWaitingListDay(Device d){
         if(waitingListDay.contains(d)) waitingListDay.remove(d);
@@ -376,7 +394,6 @@ public class ManagementSystem {
 
     public void setAllCriticalDeviceStatus(int newStatus){
         for(int i = 0; i < rooms.size(); i++){
-            //todo no uses
             for(int j = 0; j < rooms.get(i).getDevicesList().size(); j++){
                 if(rooms.get(i).getDevicesList().get(j).isCritical()){
                     rooms.get(i).getDevicesList().get(j).setStatus(newStatus);
@@ -387,7 +404,6 @@ public class ManagementSystem {
 
     public void setRoomCriticalDeviceStatus(Room r, int newStatus){
         for(int i = 0; i < r.getDevicesList().size(); i++){
-            //todo no uses
             if(r.getDevicesList().get(i).isCritical()){
                 rooms.get(i).getDevicesList().get(i).setStatus(newStatus);
             }
@@ -396,7 +412,6 @@ public class ManagementSystem {
 
     public boolean checkAllRoomsForCriticalDevice(){
         for(int i = 0; i < rooms.size(); i++){
-            //todo no uses
             for(int j = 0; j < rooms.get(i).getDevicesList().size(); j++){
                 if(rooms.get(i).getDevicesList().get(j).isCritical()){
                     return true;
@@ -407,7 +422,6 @@ public class ManagementSystem {
     }
 
     public boolean checkRoomForCriticalDevice(Room r){
-        //todo no uses
         for(int i = 0; i < r.getDevicesList().size(); i++){
             if(r.getDevicesList().get(i).isCritical()){
                 return true;

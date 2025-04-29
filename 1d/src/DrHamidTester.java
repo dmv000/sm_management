@@ -1,3 +1,4 @@
+import java.sql.SQLOutput;
 import java.util.Scanner;
 public class DrHamidTester {
     public final static Scanner scan = new Scanner(System.in);
@@ -201,8 +202,6 @@ public class DrHamidTester {
                     managementSystem.shutDownAllDevices();
                 }
                 break;
-                //todo do we need to check for critical devices??? done
-                //if checkAllRoomsForCriticalDevice() prompt the admin password and use setAllCriticalDeviceStatus() done
 
             case 11:
                 // Check current power consumption
@@ -301,10 +300,34 @@ public class DrHamidTester {
                     System.out.println("System set to day mode.");
                 }else if (dayNight == 2) {
                     managementSystem.setNightTime();
-                    //todo check for noisy devices and take user input
-                    //   when set night --> checks for running noisy devices
-                    //   --> input user --> off / standy by in waitlist / kept on (ask user)
-                    //   use methods --checkForRuningNoisyDevices() --setNoisyDeviceStatus() --addDeviceToWaitingListDay()
+                    if (managementSystem.checkForRunningNoisyDevices()){
+                        System.out.println("It is night! Noisy devices detected!");
+                        System.out.println("Choose an option: ");
+                        System.out.println("1. Keep the devices on anyways");
+                        System.out.println("2. Add the devices to the day waitlist");
+                        System.out.println("3. Turn the noisy devices off");
+                        switch(scan.nextInt()){
+                            case 1:
+                                System.out.println("Noisy devices kept on");
+                                managementSystem.setNightTime();
+                                System.out.println("It is night!");
+                                break;
+                            case 2:
+                                managementSystem.addNoisyDevicesToWaitingListDay();
+                                System.out.println("Noisy devices added to waitlist");
+                                managementSystem.setNightTime();
+                                System.out.println("It is night!");
+                                break;
+                            case 3:
+                                managementSystem.setNoisyDeviceStatus(Device.OFF);
+                                managementSystem.setNightTime();
+                                System.out.println("Noisy devices turned off");
+                                break;
+                            default:
+                                System.out.println("Invalid Option");
+                                break;
+                        }
+                    }
                     System.out.println("System set to night mode.");
                 }else {
                     System.out.println("Invalid input.");
