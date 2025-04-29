@@ -249,7 +249,7 @@ public class ManagementSystem {
     }
 
     //calculate total consumption between all rooms
-    private double getTotalPowerConsumption(){
+    public double getTotalPowerConsumption(){
         double count = 0;
         for(int i = 0; i < rooms.size(); i++){
             count += rooms.get(i).getCurrentConsumption();
