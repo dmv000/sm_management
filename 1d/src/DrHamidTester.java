@@ -1,4 +1,5 @@
 import java.sql.SQLOutput;
+import java.util.ArrayList;
 import java.util.Scanner;
 public class DrHamidTester {
     public final static Scanner scan = new Scanner(System.in);
@@ -7,22 +8,22 @@ public class DrHamidTester {
     //(role) is a method in managementsystem class
     private static int role = 0;
 
-    public static void main(String[] args) {
+    public static void main(String[] args){
         //prompt and check the adminn and user password to be true and stores it
         String adminPwd;
-        do {
+        do{
             System.out.print("Set the initial Admin pass: ");
             adminPwd = scan.nextLine();
-            if (!ManagementSystem.passwordIsValid(adminPwd)) {
+            if(!ManagementSystem.passwordIsValid(adminPwd)){
                 System.out.println("Password must be at least 8 characters long and include uppercase, lowercase, digit, and special character.");
             }
-        } while (!ManagementSystem.passwordIsValid(adminPwd));
+        } while(!ManagementSystem.passwordIsValid(adminPwd));
 
         String userPwd;
         do {
             System.out.print("Set the initial User Pass: ");
             userPwd = scan.nextLine();
-            if (!ManagementSystem.passwordIsValid(userPwd)) {
+            if(!ManagementSystem.passwordIsValid(userPwd)){
                 System.out.println("Password must be at least 8 characters long and include uppercase, lowercase, digit, and special character.");
             }
         } while (!ManagementSystem.passwordIsValid(userPwd));
@@ -30,12 +31,12 @@ public class DrHamidTester {
 
         //Roles admin/user/exit to main menu
         System.out.println("Welcome to your House Management System");
-        while (true) {
-            if (role == 0) {
+        while(true){
+            if(role == 0){
                 loginMenu();
-            } else if (role == 1) {
+            }else if(role == 1){
                 userMenu();
-            } else {
+            }else{
                 adminMenu();
             }
         }
@@ -56,15 +57,15 @@ public class DrHamidTester {
     int powerLevelChoice = 0;
 
     //This prompt the method checkAccess to define admin/user role
-    private static void loginMenu() {
+    private static void loginMenu(){
         System.out.println("Please enter the Contol or Admin password (or x to exit): ");
         String pswd = scan.nextLine();
 
-        if ("x".equals(pswd)) {
+        if("x".equals(pswd)){
             System.exit(0);
         }
         role = managementSystem.checkAccess(pswd);
-        if (role == 0) {
+        if(role == 0){
             System.out.println("Access Denied, Try again: ");
         }
     }
@@ -134,15 +135,15 @@ public class DrHamidTester {
                 int deviceId = scan.nextInt();
                 scan.nextLine();
                 Device foundDevice = managementSystem.searchDeviceById(deviceId);
-                if (foundDevice != null) {
+                if(foundDevice != null){
                     System.out.println(foundDevice);
-                } else {
+                }else{
                     System.out.println("Device not found.");
                 }
                 break;
             case 8:
                 // Turn on/ Turn off a device
-                //todo Under construction!
+
 
             //on
                             //check use managementSystem.checkTurnOnDevice()
@@ -171,10 +172,10 @@ public class DrHamidTester {
                     System.out.print("Critical device/s detected in the room. Please enter the admin password to proceed: ");
                     String adminPassword = scan.nextLine();
                     int accessLevel = managementSystem.checkAccess(adminPassword);
-                    if (accessLevel == ManagementSystem.ADMIN) {
+                    if(accessLevel == ManagementSystem.ADMIN){
                         managementSystem.shutDownAllDevices();
                         System.out.println("All devices in the room have been turned off.");
-                    } else {
+                    }else{
                         managementSystem.shutDownOneRoom(foundRoom);
                         managementSystem.setRoomCriticalDeviceStatus(foundRoom, Device.ON);
                         System.out.println("Incorrect admin password. " +
@@ -193,7 +194,7 @@ public class DrHamidTester {
                     if (accessLevel == ManagementSystem.ADMIN) {
                         managementSystem.shutDownAllDevices();
                         System.out.println("All devices in the house have been turned off.");
-                    } else {
+                    }else{
                         managementSystem.shutDownAllDevices();
                         managementSystem.setAllCriticalDeviceStatus(Device.ON);
                         System.out.println("Incorrect admin password! Only non-critical devices have been turned off.");
@@ -210,23 +211,23 @@ public class DrHamidTester {
             case 12:
                 //Set day/night mode
                 int timeMode = -1;
-                while (true) {
+                while(true){
                     System.out.print("Set day/night mode (1 = Day, 0 = Night): ");
-                    if (scan.hasNextInt()) {
+                    if(scan.hasNextInt()) {
                         timeMode = scan.nextInt();
                         scan.nextLine();
-                        if (timeMode == 1) {
+                        if(timeMode == 1) {
                             managementSystem.setDayTime();
                             System.out.println("Mode updated to Day.");
                             break;
-                        } else if (timeMode == 0) {
+                        }else if(timeMode == 0) {
                             managementSystem.setNightTime();
                             System.out.println("Mode updated to Night.");
                             break;
-                        } else {
+                        }else{
                             System.out.println("Invalid input. Please enter 1 for Day or 0 for Night.");
                         }
-                    } else {
+                    }else{
                         System.out.println("Invalid input. Please enter a valid number (1 for Day or 0 for Night).");
                         scan.nextLine();
                     }
@@ -266,10 +267,10 @@ public class DrHamidTester {
                 if (type == 1) {
                     managementSystem.changeAdminPassword(newPass);
                     System.out.println("Admin password changed.");
-                } else if (type == 2) {
+                }else if(type == 2) {
                     managementSystem.changeUserPassword(newPass);
                     System.out.println("User password changed.");
-                } else {
+                }else{
                     System.out.println("Invalid choice.");
                 }
                 break;
@@ -298,7 +299,7 @@ public class DrHamidTester {
                 if (dayNight == 1) {
                     managementSystem.setDayTime();
                     System.out.println("System set to day mode.");
-                }else if (dayNight == 2) {
+                }else if(dayNight == 2) {
                     managementSystem.setNightTime();
                     if (managementSystem.checkForRunningNoisyDevices()){
                         System.out.println("It is night! Noisy devices detected!");
@@ -378,39 +379,67 @@ public class DrHamidTester {
                 int actionDevice = scan.nextInt();
                 scan.nextLine();
                 if (actionDevice == 1) {
-                    //device id
-                    System.out.print("Enter device id: ");
+                    System.out.println("Select type of device: \n 1. Appliance \n 2. Light");
+                    int deviceType = scan.nextInt();
+                    scan.nextLine();
+
+                    //there are commonn properties i can prompt at first:
+                    System.out.println("Enter device id:");
                     int deviceId = scan.nextInt();
                     scan.nextLine();
-                    //device name
-                    System.out.print("Enter device name: ");
+
+                    System.out.println("Enter device name:");
                     String deviceName = scan.nextLine();
-                    //max power consumption
-                    System.out.print("Enter max power consumption: ");
+
+                    System.out.println("Enter max power consumption:");
                     double maxPower = scan.nextDouble();
                     scan.nextLine();
-                    //isCritical
+
+                    System.out.println("Enter power levels between (0-100):");
+                    System.out.println("Each one at a time, and -1 to stop: ");
+                    ArrayList<Integer> powerList = new ArrayList<>();
+                    while(true){
+                        int lvl = scan.nextInt();
+                        scan.nextLine(); //todo should it be inside or outside the loop to clear the buffer??
+                        if (lvl == -1) break;
+                        if (lvl >= 0 && lvl <= 100) {
+                            powerList.add(lvl);
+                        } else {
+                            System.out.println("Invalid value. Enter a value between 0 and 100, or -1 to stop.");
+                        }
+                    }
+                    //ArrayList<Integer> to int[] converter (constructor takes list)
+                    int[] powerLevels = new int[powerList.size()];
+                    for (int i = 0; i < powerList.size(); i++) {
+                        powerLevels[i] = powerList.get(i);
+                    }
+
                     System.out.print("Is the device critical? (true/false): ");
                     boolean criticalInput = scan.nextBoolean();
                     scan.nextLine();
-                    //device power levels
-                    System.out.print("Enter the power level: ");
-                    //todo power levels is an array, keep inputing until a certain value(-1) is inputted
-                    // the values taken should be betwenn 0 and 100 included
-                    int singlePowerLevel = scan.nextInt();
-                    scan.nextLine();
-                    int[] powerLevels = new int[] { singlePowerLevel };
-                    //isNoisy
-                    System.out.print("Is the device noisy? (true/false): ");
-                    boolean noisyInput = scan.nextBoolean();
-                    scan.nextLine();
+
+                    Device device = null;
+
+                    if (deviceType == 1) { // Appliance
+                        System.out.print("Is the appliance noisy? (true/false): ");
+                        boolean noisyInput = scan.nextBoolean();
+                        scan.nextLine();
+                        device = new Appliance(deviceId, deviceName, maxPower, noisyInput, powerLevels, criticalInput);
+                    } else if (deviceType == 2) { // Light
+                        System.out.print("Is the light adjustable? (true/false): ");
+                        boolean adjustableInput = scan.nextBoolean();
+                        scan.nextLine();
+                        device = new Light(deviceId, deviceName, maxPower, adjustableInput, powerLevels, criticalInput);
+                    } else {
+                        System.out.println("Invalid device type.");
+                        break;
+                    }
 
                     System.out.print("Enter room code to add this device: ");
                     String roomCode = scan.nextLine();
-
                     Room room = managementSystem.searchRoomByCode(roomCode);
-                    if (room != null) {
-                        Appliance device = new Appliance(deviceId, deviceName, maxPower, noisyInput, powerLevels, criticalInput);
+
+                    if (room != null && device != null) {
                         int result = managementSystem.addDevice(device, room);
                         if (result == 0) {
                             System.out.println("Device added.");
@@ -420,8 +449,9 @@ public class DrHamidTester {
                             System.out.println("Duplicate device id.");
                         }
                     } else {
-                        System.out.println("Room not found.");
+                        System.out.println("Room not found or invalid device.");
                     }
+
                 } else if (actionDevice == 2) {
                     System.out.print("Enter device id to delete: ");
                     int deviceId = scan.nextInt();
@@ -447,7 +477,8 @@ public class DrHamidTester {
                     System.out.println("Invalid option.");
                 }
                 break;
-
+                    //todo power levels is an array, keep inputing until a certain value(-1) is inputted done
+                    // the values taken should be betwenn 0 and 100 included done
             case 6:
                 role = 0;
                 break;
