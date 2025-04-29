@@ -58,15 +58,15 @@ public class DashboardTester {
         System.out.println(
                 "Control Menu:\n" +
                 "1. Check all rooms info\n" +
-                "2. Check all devices info\n" +//under construction
-                "3. Check all running devices\n" +//needs implementation
+                "2. Check all devices info\n" +
+                "3. Check all running devices\n" +
                 "4. Check all standby devices in the day waiting list\n" +
                 "5. Check all standby devices in the power waiting list\n" +
                 "6. Search for a given room\n" +
                 "7. Search for a given device\n" +
                 "8. Turn on/Turn off a device\n" +
-                "9. Turn off all devices from one specific room\n" +//??
-                "10. Turn off all devices in the house\n" + //needs implementation
+                "9. Turn off all devices from one specific room\n" +
+                "10. Turn off all devices in the house\n" +
                 "11. Check current power consumption\n" +
                 "12. Set day/night mode\n" +
                 "13. Exit control mode");
@@ -354,8 +354,7 @@ public class DashboardTester {
                 setDayNightMode();
                 break;
             case 4:
-                // Add/Delete/Search a room
-                //can be made with switch case (Better?)
+                //Add/Delete/Search a room
                 System.out.println("1. Add Room\n2. Delete Room\n3. Search Room");
                 int actionRoom = scan.nextInt();
                 scan.nextLine();
@@ -391,7 +390,7 @@ public class DashboardTester {
                 break;
 
             case 5:
-                // Add/Delete/Search a device
+                //Add/Delete/Search a device
                 System.out.println("1. Add Device\n 2. Delete Device\n 3. Search Device");
                 int actionDevice = scan.nextInt();
                 scan.nextLine();
@@ -413,10 +412,10 @@ public class DashboardTester {
                     double maxPower = scan.nextDouble();
                     scan.nextLine();
 
-                    // Input power levels
+                    //Input power levels
                     System.out.println("Enter power levels (0-100), one at a time. Enter -1 to finish:");
                     ArrayList<Integer> powerList = new ArrayList<>();
-                    while (true) {
+                    while(true){
                         int lvl = scan.nextInt();
                         scan.nextLine(); //should this be outside the loop to clear the buffer?todo
                         if (lvl == -1) break;
@@ -458,41 +457,41 @@ public class DashboardTester {
                     String roomCode = scan.nextLine();
                     Room room = managementSystem.searchRoomByCode(roomCode);
 
-                    if (room != null && device != null) {
+                    if(room != null && device != null){
                         int result = managementSystem.addDevice(device, room);
-                        if (result == 0) {
+                        if(result == 0){
                             System.out.println("Device added.");
-                        } else if (result == 1) {
+                        }else if(result == 1){
                             System.out.println("Room not found.");
-                        } else {
+                        }else{
                             System.out.println("Duplicate device id.");
                         }
-                    } else {
+                    }else{
                         System.out.println("Room not found or invalid device.");
                     }
 
-                } else if (actionDevice == 2) {
+                } else if(actionDevice == 2){
                     System.out.print("Enter device id to delete: ");
                     int deviceId = scan.nextInt();
                     scan.nextLine();
                     Device device = managementSystem.searchDeviceById(deviceId);
-                    if (device != null) {
+                    if(device != null){
                         managementSystem.removeDevice(device);
                         System.out.println("Device deleted.");
-                    } else {
+                    }else{
                         System.out.println("Device not found.");
                     }
-                } else if (actionDevice == 3) {
+                } else if(actionDevice == 3){
                     System.out.print("Enter device id to search: ");
                     int deviceId = scan.nextInt();
                     scan.nextLine();
                     Device device = managementSystem.searchDeviceById(deviceId);
-                    if (device != null) {
+                    if(device != null){
                         System.out.println("Device found:\n" + device);
-                    } else {
+                    }else{
                         System.out.println("Device not found.");
                     }
-                } else {
+                }else{
                     System.out.println("Invalid option.");
                 }
                 break;
@@ -509,10 +508,10 @@ public class DashboardTester {
         System.out.print("Set mode 1 to Day or 2 to Night: ");
         int dayNight = scan.nextInt();
         scan.nextLine();
-        if (dayNight == 1) {
+        if(dayNight == 1){
             managementSystem.setDayTime();
             System.out.println("System set to day mode.");
-        }else if (dayNight == 2) {
+        }else if(dayNight == 2){
             managementSystem.setNightTime();
             if (managementSystem.checkForRunningNoisyDevices()){
                 System.out.println("It is night! Noisy devices detected!");
