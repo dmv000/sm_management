@@ -1,15 +1,12 @@
 import java.util.Scanner;
-
 public class DrHamidTester {
-
+    public final static Scanner scan = new Scanner(System.in);
     private static ManagementSystem managementSystem;
     //0 = not logged in; 1 = user login; 2 = admin login
     //(role) is a method in managementsystem class
     private static int role = 0;
 
     public static void main(String[] args) {
-        Scanner scan = new Scanner(System.in);
-
         //prompt and check the adminn and user password to be true and stores it
         String adminPwd;
         do {
@@ -31,21 +28,21 @@ public class DrHamidTester {
         managementSystem = new ManagementSystem(adminPwd, userPwd);
 
         //Roles admin/user/exit to main menu
+        System.out.println("Welcome to your House Management System");
         while (true) {
             if (role == 0) {
-                loginMenu(scan);
+                loginMenu();
             } else if (role == 1) {
-                userMenu(scan);
+                userMenu();
             } else {
-                adminMenu(scan);
+                adminMenu();
             }
         }
     }
 
     //This prompt the method checkAccess to define admin/user role
-    private static void loginMenu(Scanner scan) {
-        System.out.println("Welcome to your House Management System");
-        System.out.println("Please enter the User or Admin password (or x to exit): ");
+    private static void loginMenu() {
+        System.out.println("Please enter the Contol or Admin password (or x to exit): ");
         String pswd = scan.nextLine();
 
         if ("x".equals(pswd)) {
@@ -57,8 +54,9 @@ public class DrHamidTester {
         }
     }
 
-    private static void userMenu(Scanner scan){
+    private static void userMenu(){
         System.out.println(
+                "Control Menu:\n" +
                 "1. Check all rooms info\n" +
                 "2. Check all devices info\n" +//under construction
                 "3. Check all running devices\n" +//needs implementation
@@ -71,7 +69,7 @@ public class DrHamidTester {
                 "10. Turn off all devices in the house\n" + //needs implementation
                 "11. Check current power consumption\n" +
                 "12. Set day/night mode\n" +
-                "0. Exit user mode");
+                "13. Exit control mode");
 
         System.out.print("Select action: ");
         int action = scan.nextInt();
@@ -82,15 +80,16 @@ public class DrHamidTester {
         switch(action){
             case 1:
                 // Check all rooms info
+                System.out.println("All Rooms:");
                 System.out.println(managementSystem.displaySummaryAllRooms());
                 break;
             case 2:
                 //Check all devices info
-                //??
+                System.out.println(managementSystem.displayInfo());
             case 3:
                 // Check all running devices
-                //if device is running displaySummaryOfDevices
-                System.out.println(managementSystem.displaySummaryAllRooms());
+                System.out.println("Running Devices:");
+                System.out.println(managementSystem.displayAllRunningDevices());
                 break;
             case 4:
                 // Check all standby devices in the day waiting list
@@ -132,34 +131,37 @@ public class DrHamidTester {
                  scan.nextLine();
                  foundDevice = managementSystem.searchDeviceById(d1);
                  if (foundDevice != null) {
-                 System.out.print("Turn on (1) or off (0): ");
-                 int onOff = scan.nextInt();
-                 scan.nextLine();
-                 if (onOff == 1) foundDevice.turnOn();
-                 else foundDevice.turnOff();
-                 System.out.println("Device updated: " + foundDevice);
+                    System.out.print("Turn on (1) or off (0): ");
+                    int onOff = scan.nextInt();
+                    scan.nextLine();
+                    if (onOff == 1){
+                        //todo check use managementSystem.checkTurnOnDevice()
+                        foundDevice.turnOn();
+                    } else {
+                        //todo check if device is critical
+                        foundDevice.turnOff();
+                    }
+                    System.out.println("Device updated: " + foundDevice);
                  } else {
-                 System.out.println("Device not found.");
+                    System.out.println("Device not found.");
                  }
                  break;
 
             case 9:
                 // Turn off all devices from one specific room
-                //AI help
+                //todo do we need to check for critical devices???
                 System.out.print("Enter room code: ");
                 String code = scan.nextLine();
                 foundRoom = managementSystem.searchRoomByCode(code);
                 if (foundRoom != null) {
-                    for (Device device : foundRoom.getDevicesList()) {
-                        device.turnOff();
-                    }
+                    managementSystem.shutDownOneRoom(foundRoom);
                     System.out.println("All devices in room turned off.");
                 } else {
                     System.out.println("Room not found.");
                 }
                 break;
             case 10:
-                // Turn off all devices in the house
+                // todo Turn off all devices in the house
                 // If device is critical prompt the admin password
                 //same as 9 and then another loop to turn off all devices in the house
 
@@ -175,8 +177,9 @@ public class DrHamidTester {
                 if (timeMode == 1) managementSystem.setDayTime();
                 else managementSystem.setNightTime();
                 System.out.println("Mode updated.");
+                //todo what if other than 1 or 0 is inputed?
                 break;
-            case 0:
+            case 13:
                 role = 0;
                 break;
             default:
@@ -185,7 +188,7 @@ public class DrHamidTester {
         }
     }
 
-    private static void adminMenu(Scanner scan){
+    private static void adminMenu(){
         System.out.println(
                 "Admin Menu:\n" +
                 "1. Change admin and user passwords\n" +
@@ -193,7 +196,7 @@ public class DrHamidTester {
                 "3. Set day/time mode\n" +
                 "4. Add/Delete/Search a room\n" +
                 "5. Add/Delete/Search a device\n" +
-                "0. Logout");
+                "6. Exit Admin Mode");
 
         System.out.print("Select action: ");
         int action = scan.nextInt();
@@ -224,11 +227,14 @@ public class DrHamidTester {
                 scan.nextLine();
                 if(mPower == 1){
                     managementSystem.maxAllowedPower = ManagementSystem.LOW;
+                    System.out.println("Max allower power is set to: LOW");
                 }
                 else if(mPower == 2){
                     managementSystem.maxAllowedPower = ManagementSystem.NORMAL;
+                    System.out.println("Max allower power is set to: NORMAL");
                 }else{
                     managementSystem.maxAllowedPower = ManagementSystem.HIGH;
+                    System.out.println("Max allower power is set to: HIGH");
                 }
                 break;
             case 3:
@@ -241,6 +247,7 @@ public class DrHamidTester {
                     System.out.println("System set to day mode.");
                 }else if (dayNight == 2) {
                     managementSystem.setNightTime();
+                    //todo check for noisy devices and take user input
                     System.out.println("System set to night mode.");
                 }else {
                     System.out.println("Invalid input.");
@@ -249,7 +256,7 @@ public class DrHamidTester {
             case 4:
                 // Add/Delete/Search a room
                 //can be made with switch case (Better?)
-                System.out.println("1. Add Room\n 2. Delete Room\n 3. Search Room");
+                System.out.println("1. Add Room\n2. Delete Room\n3. Search Room");
                 int actionRoom = scan.nextInt();
                 scan.nextLine();
                 if(actionRoom == 1){
@@ -265,9 +272,9 @@ public class DrHamidTester {
                     Room roomToRemove = managementSystem.searchRoomByCode(code);
                     if(roomToRemove != null){
                         managementSystem.removeRooms(roomToRemove);
-                        System.out.println("Room removed ");
+                        System.out.println("Room removed!");
                     }else{
-                        System.out.println("Room not found ");
+                        System.out.println("Room not found!");
                     }
                 }else if(actionRoom == 3){
                     System.out.print("Enter room code to search: ");
@@ -276,10 +283,10 @@ public class DrHamidTester {
                     if(foundRoom != null){
                         System.out.println("Room found:\n" + foundRoom);
                     }else{
-                        System.out.println("Room not found.");
+                        System.out.println("Room not found!");
                     }
                 }else{
-                    System.out.println("Invalid option.");
+                    System.out.println("Invalid option!");
                 }
                 break;
 

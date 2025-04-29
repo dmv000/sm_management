@@ -288,6 +288,7 @@ public class ManagementSystem {
     }
 
     public boolean checkForRunningNoisyDevices(){
+        //todo no uses
         for(int i = 0; i < rooms.size(); i++){
             for(int j = 0; j < rooms.get(i).getDevicesList().size(); j++){
                 if(rooms.get(i).getDevicesList().get(j) instanceof Appliance){
@@ -299,8 +300,21 @@ public class ManagementSystem {
         return false;
     }
 
+    public String displayAllRunningDevices() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < rooms.size(); i++) {
+            for (int j = 0; j < rooms.get(i).getDevicesList().size(); j++) {
+                if (rooms.get(i).getDevicesList().get(j).getStatus() == Device.ON) {
+                    sb.append(rooms.get(i).getDevicesList().get(j).toString());
+                }
+            }
+        }
+        return sb.toString();
+    }
+
     //set the newStatus for all noisy devices only
     public void setNoisyDeviceStatus(int newStatus){
+        //todo no uses
         for(int i = 0; i < rooms.size(); i++){
             for(int j = 0; j < rooms.get(i).getDevicesList().size(); j++){
                 if(rooms.get(i).getDevicesList().get(j) instanceof Appliance

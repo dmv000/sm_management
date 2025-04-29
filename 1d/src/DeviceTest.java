@@ -220,9 +220,11 @@ public class DeviceTest {
                 System.out.println("Enter room code to shutDown");
                 Room targetRoom = managementSystem.searchRoomByCode(scan.nextLine());
                 managementSystem.shutDownOneRoom(targetRoom);
+                System.out.println("Shut down all devices in room " + targetRoom.getCode());
                 break;
             case 11:
                 managementSystem.shutDownAllDevices();
+                System.out.println("All devices shut down");
                 break;
             case 12:
                 System.out.println(managementSystem.listStandByDayDevices());
@@ -267,6 +269,7 @@ public class DeviceTest {
             default:
                 System.out.println("Invalid action");
         }
+
     }
 
 }
