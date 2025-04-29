@@ -1,4 +1,5 @@
 import java.sql.SQLOutput;
+import java.util.ArrayList;
 import java.util.Scanner;
 public class DrHamidTester {
     public final static Scanner scan = new Scanner(System.in);
@@ -312,45 +313,73 @@ public class DrHamidTester {
 
             case 5:
                 // Add/Delete/Search a device
-                //can be made with switch case (Better?)
-                // todo make 2 cases: one for appliance (noisy or not) and one for light(adjustable or not)
-                System.out.println("1. Add Device\n2. Delete Device\n3. Search Device");
+                System.out.println("1. Add Device\n 2. Delete Device\n 3. Search Device");
                 int actionDevice = scan.nextInt();
                 scan.nextLine();
+
                 if (actionDevice == 1) {
-                    //device id
+                    System.out.println("Select type of device to add:\n1. Appliance\n2. Light");
+                    int deviceType = scan.nextInt();
+                    scan.nextLine();
+
+                    // Common properties
                     System.out.print("Enter device id: ");
                     int deviceId = scan.nextInt();
                     scan.nextLine();
-                    //device name
+
                     System.out.print("Enter device name: ");
                     String deviceName = scan.nextLine();
-                    //max power consumption
+
                     System.out.print("Enter max power consumption: ");
                     double maxPower = scan.nextDouble();
                     scan.nextLine();
-                    //isCritical
+
+                    // Input power levels
+                    System.out.println("Enter power levels (0-100), one at a time. Enter -1 to finish:");
+                    ArrayList<Integer> powerList = new ArrayList<>();
+                    while (true) {
+                        int lvl = scan.nextInt();
+                        scan.nextLine(); //should this be outside the loop to clear the buffer?todo
+                        if (lvl == -1) break;
+                        if (lvl >= 0 && lvl <= 100) {
+                            powerList.add(lvl);
+                        } else {
+                            System.out.println("Invalid value. Enter a value between 0 and 100, or -1 to finish.");
+                        }
+                    }
+
+                    //this conversion from ArrayList<Integer> to int[] so it is accepted in the constructor
+                    int[] powerLevels = new int[powerList.size()];
+                    for (int i = 0; i < powerList.size(); i++) {
+                        powerLevels[i] = powerList.get(i);
+                    }
+
                     System.out.print("Is the device critical? (true/false): ");
                     boolean criticalInput = scan.nextBoolean();
                     scan.nextLine();
-                    //device power levels
-                    System.out.print("Enter the power level: ");
-                    //todo power levels is an array, keep inputing until a certain value(-1) is inputted
-                    // the values taken should be betwenn 0 and 100 included
-                    int singlePowerLevel = scan.nextInt();
-                    scan.nextLine();
-                    int[] powerLevels = new int[] { singlePowerLevel };
-                    //isNoisy
-                    System.out.print("Is the device noisy? (true/false): ");
-                    boolean noisyInput = scan.nextBoolean();
-                    scan.nextLine();
+
+                    Device device = null;
+
+                    if (deviceType == 1) { //for appliance
+                        System.out.print("Is the appliance noisy? (true/false): ");
+                        boolean noisyInput = scan.nextBoolean();
+                        scan.nextLine();
+                        device = new Appliance(deviceId, deviceName, maxPower, noisyInput, powerLevels, criticalInput);
+                    } else if (deviceType == 2) { //for light
+                        System.out.print("Is the light adjustable? (true/false): ");
+                        boolean adjustableInput = scan.nextBoolean();
+                        scan.nextLine();
+                        device = new Light(deviceId, deviceName, maxPower, adjustableInput, powerLevels, criticalInput);
+                    } else {
+                        System.out.println("Invalid device type.");
+                        break;
+                    }
 
                     System.out.print("Enter room code to add this device: ");
                     String roomCode = scan.nextLine();
-
                     Room room = managementSystem.searchRoomByCode(roomCode);
-                    if (room != null) {
-                        Appliance device = new Appliance(deviceId, deviceName, maxPower, noisyInput, powerLevels, criticalInput);
+
+                    if (room != null && device != null) {
                         int result = managementSystem.addDevice(device, room);
                         if (result == 0) {
                             System.out.println("Device added.");
@@ -360,8 +389,9 @@ public class DrHamidTester {
                             System.out.println("Duplicate device id.");
                         }
                     } else {
-                        System.out.println("Room not found.");
+                        System.out.println("Room not found or invalid device.");
                     }
+
                 } else if (actionDevice == 2) {
                     System.out.print("Enter device id to delete: ");
                     int deviceId = scan.nextInt();
