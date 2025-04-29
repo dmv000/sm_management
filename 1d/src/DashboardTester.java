@@ -1,7 +1,6 @@
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Scanner;
-public class DrHamidTester {
+public class DashboardTester {
     public final static Scanner scan = new Scanner(System.in);
     private static ManagementSystem managementSystem;
     //0 = not logged in; 1 = user login; 2 = admin login

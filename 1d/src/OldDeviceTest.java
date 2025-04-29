@@ -1,5 +1,5 @@
 import java.util.Scanner;
-public class DeviceTest {
+public class OldDeviceTest {
     private static ManagementSystem managementSystem;
     //0 = not logged in; 1 = logged in; 2 = admin log in
     //(role) is a method in managementsystem class
