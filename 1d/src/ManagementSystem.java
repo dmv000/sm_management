@@ -302,14 +302,16 @@ public class ManagementSystem {
 
     public String displayAllRunningDevices() {
         StringBuilder sb = new StringBuilder();
+        boolean empty = true;
         for (int i = 0; i < rooms.size(); i++) {
             for (int j = 0; j < rooms.get(i).getDevicesList().size(); j++) {
                 if (rooms.get(i).getDevicesList().get(j).getStatus() == Device.ON) {
+                    empty = false;
                     sb.append(rooms.get(i).getDevicesList().get(j).toString());
                 }
             }
         }
-        return sb.toString();
+        return (!empty) ? sb.toString() : "No devices On";
     }
 
     //set the newStatus for all noisy devices only
@@ -331,6 +333,7 @@ public class ManagementSystem {
 
     //standby methods (add, remove, display)
     public void addDeviceToWaitingListDay(Device d){
+        //todo no uses
         d.setStatus(Device.STANDBY);
         waitingListDay.add(d);
     }
@@ -341,13 +344,16 @@ public class ManagementSystem {
 
     public String listStandByDayDevices(){
         StringBuilder sb = new StringBuilder();
+        boolean empty = true;
         for(Device i : waitingListDay){
+            empty = false;
             sb.append(i.getId() + "\n");
         }
-        return sb.toString();
+        return (!empty) ? sb.toString() : "No devices on standby";
     }
 
     public void addDeviceToWaitingListPower(Device d){
+        //todo no uses
         d.setStatus(Device.STANDBY);
         waitingListPower.add(d);
     }
@@ -358,9 +364,55 @@ public class ManagementSystem {
 
     public String listStandByPowerDevices(){
         StringBuilder sb = new StringBuilder();
+        boolean empty = true;
         for (Device i : waitingListPower){
+            empty = false;
             sb.append(i.getId() + "\n");
         }
-        return sb.toString();
+        return (!empty) ? sb.toString() : "No devices on standby";
+    }
+
+    //critical(setStatus/set)
+
+    public void setAllCriticalDeviceStatus(int newStatus){
+        for(int i = 0; i < rooms.size(); i++){
+            //todo no uses
+            for(int j = 0; j < rooms.get(i).getDevicesList().size(); j++){
+                if(rooms.get(i).getDevicesList().get(j).isCritical()){
+                    rooms.get(i).getDevicesList().get(j).setStatus(newStatus);
+                }
+            }
+        }
+    }
+
+    public void setRoomCriticalDeviceStatus(Room r, int newStatus){
+        for(int i = 0; i < r.getDevicesList().size(); i++){
+            //todo no uses
+            if(r.getDevicesList().get(i).isCritical()){
+                rooms.get(i).getDevicesList().get(i).setStatus(newStatus);
+            }
+        }
+    }
+
+    public boolean checkAllRoomsForCriticalDevice(){
+        for(int i = 0; i < rooms.size(); i++){
+            //todo no uses
+            for(int j = 0; j < rooms.get(i).getDevicesList().size(); j++){
+                if(rooms.get(i).getDevicesList().get(j).isCritical()){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean checkRoomForCriticalDevice(Room r){
+        //todo no uses
+        for(int i = 0; i < r.getDevicesList().size(); i++){
+            if(r.getDevicesList().get(i).isCritical()){
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -86,9 +86,10 @@ public class DrHamidTester {
             case 2:
                 //Check all devices info
                 System.out.println(managementSystem.displayInfo());
+                break;
             case 3:
                 // Check all running devices
-                System.out.println("Running Devices:");
+                System.out.println("Running Devices: \n");
                 System.out.println(managementSystem.displayAllRunningDevices());
                 break;
             case 4:
@@ -135,12 +136,32 @@ public class DrHamidTester {
                     int onOff = scan.nextInt();
                     scan.nextLine();
                     if (onOff == 1){
+                        //on
                         //todo check use managementSystem.checkTurnOnDevice()
-                        foundDevice.turnOn();
+
+                        //todo if appliance --> turnOn() or turnOn(currentLEvel)
+                        // display the powerLevels array and give the user a choice form one of them
+                        //  the inputted choice should be between 0 and the length of the array(index)
+
+                        //todo if light --> turnOn(level) -- between 0 and 100 >> give a choice
+                        // inputted choice is the number
+                        //0 >> no constraints
+                            //turn on
+                        //1 >> noisy and night>> can turn on anyway / standby+waiting list / cancel (ask user)
+                            //turn on
+                            //addDeviceToWaitingListDay();
+                            //exit
+                        //2 >> not enough power --> waitlist / cancel (ask user)
+                            //addDeviceToWaitingListPower();
+                            //exit
+
                     } else {
+                        //off
                         //todo check if device is critical
+                        //take admin password
                         foundDevice.turnOff();
                     }
+                    //todo take cases 1 or 0, else redo.
                     System.out.println("Device updated: " + foundDevice);
                  } else {
                     System.out.println("Device not found.");
@@ -149,22 +170,24 @@ public class DrHamidTester {
 
             case 9:
                 // Turn off all devices from one specific room
-                //todo do we need to check for critical devices???
                 System.out.print("Enter room code: ");
                 String code = scan.nextLine();
                 foundRoom = managementSystem.searchRoomByCode(code);
                 if (foundRoom != null) {
                     managementSystem.shutDownOneRoom(foundRoom);
+                    // todo do we need to check for critical devices???
+                    //if checkRoomForCriticalDevice() true as for admin password  and use setRoomCriticalDeviceStatus(Room r, int newStatus)
+                    //if false ignore
                     System.out.println("All devices in room turned off.");
                 } else {
                     System.out.println("Room not found.");
                 }
                 break;
             case 10:
-                // todo Turn off all devices in the house
-                // If device is critical prompt the admin password
-                //same as 9 and then another loop to turn off all devices in the house
-
+                // Turn off all devices in the house
+                // todo do we need to check for critical devices???
+                // if checkAllRoomsForCriticalDevice() prompt the admin password and use setAllCriticalDeviceStatus()
+                break;
             case 11:
                 // Check current power consumption
                 System.out.println("Current power consumption: " + managementSystem.getTotalPowerConsumption());
@@ -248,6 +271,9 @@ public class DrHamidTester {
                 }else if (dayNight == 2) {
                     managementSystem.setNightTime();
                     //todo check for noisy devices and take user input
+                    //   when set night --> checks for running noisy devices
+                    //   --> input user --> off / standy by in waitlist / kept on (ask user)
+                    //   use methods --checkForRuningNoisyDevices() --setNoisyDeviceStatus() --addDeviceToWaitingListDay()
                     System.out.println("System set to night mode.");
                 }else {
                     System.out.println("Invalid input.");
@@ -293,7 +319,8 @@ public class DrHamidTester {
             case 5:
                 // Add/Delete/Search a device
                 //can be made with switch case (Better?)
-                System.out.println("1. Add Device\n 2. Delete Device\n 3. Search Device");
+                // todo make 2 cases: one for appliance (noisy or not) and one for light(adjustable or not)
+                System.out.println("1. Add Device\n2. Delete Device\n3. Search Device");
                 int actionDevice = scan.nextInt();
                 scan.nextLine();
                 if (actionDevice == 1) {
@@ -314,6 +341,8 @@ public class DrHamidTester {
                     scan.nextLine();
                     //device power levels
                     System.out.print("Enter the power level: ");
+                    //todo power levels is an array, keep inputing until a certain value(-1) is inputted
+                    // the values taken should be betwenn 0 and 100 included
                     int singlePowerLevel = scan.nextInt();
                     scan.nextLine();
                     int[] powerLevels = new int[] { singlePowerLevel };
