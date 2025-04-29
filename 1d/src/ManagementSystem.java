@@ -299,7 +299,8 @@ public class ManagementSystem {
         for(int i = 0; i < rooms.size(); i++){
             for(int j = 0; j < rooms.get(i).getDevicesList().size(); j++){
                 if(rooms.get(i).getDevicesList().get(j) instanceof Appliance){
-                    if (((Appliance)rooms.get(i).getDevicesList().get(j)).isNoisy())
+                    if (((Appliance)rooms.get(i).getDevicesList().get(j)).isNoisy()
+                    && ((Appliance)rooms.get(i).getDevicesList().get(j)).getStatus() == Device.ON)
                         return true;
                 }
             }
