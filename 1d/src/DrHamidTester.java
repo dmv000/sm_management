@@ -39,6 +39,20 @@ public class DrHamidTester {
             }
         }
     }
+//------variables test
+    String roomCode = null;
+    String roomDescription = null;
+    Room foundRoom = null;
+    Room targetRoom = null;
+    Room roomToRemove = null;
+
+    int deviceId = 0;
+    String deviceName = null;
+    double devicePower = 0.0;
+    Device deviceInstance = null;
+    Device deviceToRemove = null;
+
+    int powerLevelChoice = 0;
 
     //This prompt the method checkAccess to define admin/user role
     private static void loginMenu() {
@@ -105,8 +119,8 @@ public class DrHamidTester {
             case 6:
                 // Search for a given room
                 System.out.print("Enter room code: ");
-                String r3 = scan.nextLine();
-                Room foundRoom = managementSystem.searchRoomByCode(r3);
+                String roomCode = scan.nextLine();
+                Room foundRoom = managementSystem.searchRoomByCode(roomCode);
                 if (foundRoom != null) {
                     System.out.println(foundRoom);
                 } else {
@@ -116,9 +130,9 @@ public class DrHamidTester {
             case 7:
                 // Search for a given device
                 System.out.print("Enter device id: ");
-                int d1 = scan.nextInt();
+                int deviceId = scan.nextInt();
                 scan.nextLine();
-                Device foundDevice = managementSystem.searchDeviceById(d1);
+                Device foundDevice = managementSystem.searchDeviceById(deviceId);
                 if (foundDevice != null) {
                     System.out.println(foundDevice);
                 } else {
@@ -126,81 +140,94 @@ public class DrHamidTester {
                 }
                 break;
             case 8:
-                 // Turn on/ Turn off a device
-                 System.out.print("Enter device id: ");
-                 d1 = scan.nextInt();
-                 scan.nextLine();
-                 foundDevice = managementSystem.searchDeviceById(d1);
-                 if (foundDevice != null) {
-                    System.out.print("Turn on (1) or off (0): ");
-                    int onOff = scan.nextInt();
-                    scan.nextLine();
-                    if (onOff == 1){
-                        //on
-                        //todo check use managementSystem.checkTurnOnDevice()
+                // Turn on/ Turn off a device
+                //todo Under construction!
 
-                        //todo if appliance --> turnOn() or turnOn(currentLEvel)
-                        // display the powerLevels array and give the user a choice form one of them
-                        //  the inputted choice should be between 0 and the length of the array(index)
-
-                        //todo if light --> turnOn(level) -- between 0 and 100 >> give a choice
-                        // inputted choice is the number
-                        //0 >> no constraints
+            //on
+                            //todo check use managementSystem.checkTurnOnDevice()
+                            //todo if appliance --> turnOn() or turnOn(currentLEvel)
+                            // display the powerLevels array and give the user a choice form one of them
+                            //  the inputted choice should be between 0 and the length of the array(index)
+                            //todo if light --> turnOn(level) -- between 0 and 100 >> give a choice
+                            // inputted choice is the number
+                            //0 -> no constraints
                             //turn on
-                        //1 >> noisy and night>> can turn on anyway / standby+waiting list / cancel (ask user)
+                            //1 -> noisy and night>> can turn on anyway / standby+waiting list / cancel (ask user)
                             //turn on
                             //addDeviceToWaitingListDay();
                             //exit
-                        //2 >> not enough power --> waitlist / cancel (ask user)
+                            //2 -> not enough power --> waitlist / cancel (ask user)
                             //addDeviceToWaitingListPower();
                             //exit
-
-                    } else {
-                        //off
-                        //todo check if device is critical
-                        //take admin password
-                        foundDevice.turnOff();
-                    }
-                    //todo take cases 1 or 0, else redo.
-                    System.out.println("Device updated: " + foundDevice);
-                 } else {
-                    System.out.println("Device not found.");
-                 }
-                 break;
-
+                            //todo checkTurnOnDevice
+                            //todo then in its night prompt if you want to turn on or add to waitinglist
             case 9:
                 // Turn off all devices from one specific room
-                System.out.print("Enter room code: ");
-                String code = scan.nextLine();
-                foundRoom = managementSystem.searchRoomByCode(code);
-                if (foundRoom != null) {
+                System.out.println("Enter room code to turn off all devices: ");
+                roomCode = scan.nextLine();
+                foundRoom = managementSystem.searchRoomByCode(roomCode);
+                if(managementSystem.checkRoomForCriticalDevice(foundRoom)){
+                    System.out.print("Critical device/s detected in the room. Please enter the admin password to proceed: ");
+                    String adminPassword = scan.nextLine();
+                    int accessLevel = managementSystem.checkAccess(adminPassword);
+                    if (accessLevel == 2) {
+                        managementSystem.shutDownAllDevices();
+                        System.out.println("All devices in the house have been turned off.");
+                    } else {
+                        System.out.println("Incorrect admin password. Action denied.");
+                    }
+                }else{
                     managementSystem.shutDownOneRoom(foundRoom);
-                    // todo do we need to check for critical devices???
-                    //if checkRoomForCriticalDevice() true as for admin password  and use setRoomCriticalDeviceStatus(Room r, int newStatus)
-                    //if false ignore
-                    System.out.println("All devices in room turned off.");
-                } else {
-                    System.out.println("Room not found.");
                 }
+                // todo do we need to check for critical devices??? done
                 break;
             case 10:
                 // Turn off all devices in the house
-                // todo do we need to check for critical devices???
-                // if checkAllRoomsForCriticalDevice() prompt the admin password and use setAllCriticalDeviceStatus()
+                if(managementSystem.checkAllRoomsForCriticalDevice()) {
+                    System.out.print("Critical device/s detected in the house. Please enter the admin password to proceed: ");
+                    String adminPassword = scan.nextLine();
+                    int accessLevel = managementSystem.checkAccess(adminPassword);
+                    if (accessLevel == 2) {
+                        managementSystem.shutDownAllDevices();
+                        System.out.println("All devices in the house have been turned off.");
+                    } else {
+                        System.out.println("Incorrect admin password. Action denied.");
+                    }
+                }else{
+                    managementSystem.shutDownAllDevices();}
                 break;
+                //todo do we need to check for critical devices??? done
+                //if checkAllRoomsForCriticalDevice() prompt the admin password and use setAllCriticalDeviceStatus() done
+
             case 11:
                 // Check current power consumption
                 System.out.println("Current power consumption: " + managementSystem.getTotalPowerConsumption());
                 break;
             case 12:
-                // Set day/night mode
-                System.out.print("Set mode (1 = Day, 0 = Night): ");
-                int timeMode = scan.nextInt();
-                scan.nextLine();
-                if (timeMode == 1) managementSystem.setDayTime();
-                else managementSystem.setNightTime();
-                System.out.println("Mode updated.");
-                //todo what if other than 1 or 0 is inputed?
+                //Set day/night mode
+                int timeMode = -1;
+                while (true) {
+                    System.out.print("Set day/night mode (1 = Day, 0 = Night): ");
+                    if (scan.hasNextInt()) {
+                        timeMode = scan.nextInt();
+                        scan.nextLine();
+                        if (timeMode == 1) {
+                            managementSystem.setDayTime();
+                            System.out.println("Mode updated to Day.");
+                            break;
+                        } else if (timeMode == 0) {
+                            managementSystem.setNightTime();
+                            System.out.println("Mode updated to Night.");
+                            break;
+                        } else {
+                            System.out.println("Invalid input. Please enter 1 for Day or 0 for Night.");
+                        }
+                    } else {
+                        System.out.println("Invalid input. Please enter a valid number (1 for Day or 0 for Night).");
+                        scan.nextLine();
+                    }
+                }
+                //todo what if other than 1 or 0 is inputed? done
                 break;
             case 13:
                 role = 0;
@@ -403,3 +430,14 @@ public class DrHamidTester {
     }
 
 }
+
+//noisy setNoisyDevicesStasus
+//critical
+//power levels
+//max power consumption
+//device id
+//device name
+//room code
+//turn on/turn off
+//turn off all devices in the house
+//turn off all devices from one specific room
