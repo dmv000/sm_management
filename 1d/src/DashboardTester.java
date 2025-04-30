@@ -499,8 +499,8 @@ public class DashboardTester {
                     int idR = scan.nextInt();
                     System.out.print("Enter name: ");
                     String nameR = scan.next();
-                    System.out.print("Enter max power consumption: ");
-                    double maxPowerConsumptionR = scan.nextDouble();
+                    System.out.print("Enter max power consumption: "); //todo its looping to infinity
+                    double maxPowerConsumptionR = scan.nextDouble(); //todo its looping to infinity
                     System.out.print("Is the device critical? (0=false, 1=true)");
                     boolean criticalR = (scan.nextInt() == 1 ? true : false);
                     System.out.println("enter the power levels, one at a time (-1 to stop)");
