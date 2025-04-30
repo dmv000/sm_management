@@ -138,7 +138,7 @@ public class DashboardTester {
                 System.out.print("Enter the room code: ");
                 String rCode = scan.next();
                 Room r = managementSystem.searchRoomByCode(rCode);
-                if(rCode == null){
+                if(r == null){
                     System.out.println("invalid room code");
                     break;
                 }
@@ -338,14 +338,14 @@ public class DashboardTester {
                 scan.nextLine();
                 if(mPower == 1){
                     managementSystem.maxAllowedPower = ManagementSystem.LOW;
-                    System.out.println("Max allower power is set to: LOW");
+                    System.out.println("Max allowed power is set to: LOW");
                 }
                 else if(mPower == 2){
                     managementSystem.maxAllowedPower = ManagementSystem.NORMAL;
-                    System.out.println("Max allower power is set to: NORMAL");
+                    System.out.println("Max allowed power is set to: NORMAL");
                 }else{
                     managementSystem.maxAllowedPower = ManagementSystem.HIGH;
-                    System.out.println("Max allower power is set to: HIGH");
+                    System.out.println("Max allowed power is set to: HIGH");
                 }
                 break;
             case 3:
