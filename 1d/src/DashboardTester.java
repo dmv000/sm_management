@@ -133,7 +133,7 @@ public class DashboardTester {
                 break;
             case 8:
                 //Turn on / Turn off a device
-                System.out.print("Do you want to:\n1. Turn on a device\nother. Turn off a device\n");
+                System.out.print("Do you want to:\n1. Turn on a device\n other. Turn off a device\n");
                 int choice = scan.nextInt();
                 System.out.print("Enter the room code: ");
                 String rCode = scan.next();
