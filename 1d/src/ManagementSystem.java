@@ -153,6 +153,26 @@ public class ManagementSystem {
         }
         return false;
     }
+
+    public boolean turnOnDevice(String roomCode, int deviceId, int level){
+        //check if roomCode is valid
+        Room r = searchRoomByCode(roomCode);
+        if(r == null) return false;
+        //check room if the device is present
+        for(int i = 0; i < r.getDevicesList().size(); i++){
+            if(r.getDevicesList().get(i).getId() == deviceId){
+                if(r.getDevicesList().get(i) instanceof Appliance){
+                    ((Appliance)r.getDevicesList().get(i)).turnOn(level);
+                } else {
+                    ((Light)r.getDevicesList().get(i)).turnOn(level);
+                }
+                removeDeviceFromWaitingListPower(r.getDevicesList().get(i));
+                removeDeviceFromWaitingListDay(r.getDevicesList().get(i));
+                return true;
+            }
+        }
+        return false;
+    }
     //returns false is device is not found in the room or room is invalid
     //use --checkTurnOnDevice() in main to check for the conditions:
     //if(checkTurnOnDevice(d)) turnOnDevice

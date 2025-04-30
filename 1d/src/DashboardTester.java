@@ -138,13 +138,32 @@ public class DashboardTester {
                 System.out.print("Enter the device id: ");
                 int dId = scan.nextInt();
                 Device d = managementSystem.searchDeviceById(dId);
+                //light or app
+                int c = 0;
+                if(d instanceof Light){
+                    if(!((Light)d).isAdjustable()){
+                        c = 100;
+                    } else {
+                        System.out.print("Enter the brightness level: ");
+                        c = scan.nextInt();
+                    }
+                } else {
+                    System.out.println("Enter the power level from the below:");
+                    int[] levels = ((Appliance)d).getPowerLevels();
+                    for(int i = 0; i<levels.length; i++){
+                        System.out.println(i +". " + levels[i]);
+                    }
+                    c = scan.nextInt();
+                    if(c >= levels.length) c = levels.length-1;
+                    if(c < 0) c = 0;
+                }
                 switch(choice){
                     case 1:
                         //ON
                         switch(managementSystem.checkTurnOnDevice(d)){
                             case 0:
                                 //ok
-                                managementSystem.turnOnDevice(rCode, dId);
+                                managementSystem.turnOnDevice(rCode, dId, c);
                                 break;
                             case 1:
                                 //noisy night
@@ -156,7 +175,7 @@ public class DashboardTester {
                                 System.out.print("Enter your choice: ");
                                 switch(scan.nextInt()){
                                     case 1:
-                                        managementSystem.turnOnDevice(rCode, dId);
+                                        managementSystem.turnOnDevice(rCode, dId, c);
                                         System.out.println("Device turned on");
                                         break;
                                     case 2:

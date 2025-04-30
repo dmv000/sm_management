@@ -2,11 +2,11 @@ public class Light extends Device{
     private boolean adjustable;
     int level; //between 0 and 100 def 100
 
-    public Light(int id, String name, double maxPowerConsumption, boolean adjustableInput, int[] powerLevels, boolean criticalInput){
+    public Light(int id, String name, double maxPowerConsumption){
         this(id, name, maxPowerConsumption, false, false);
     }
-    public Light(int id, String name, double maxPowerConsumption, boolean critical){
-        this(id, name, maxPowerConsumption, critical, false);
+    public Light(int id, String name, double maxPowerConsumption, boolean adjustable){
+        this(id, name, maxPowerConsumption, false, adjustable);
     }
     public Light(int id, String name, double maxPowerConsumption, boolean critical, boolean adjustable){
         super(id, name, maxPowerConsumption, critical);
@@ -27,6 +27,9 @@ public class Light extends Device{
     public void setLevel(int level){
         if(adjustable) {
             if(level >= 0 && level <= 100) this.level = level;
+            else this.level = 100;
+        } else {
+            this.level = 100;
         }
     }
 
