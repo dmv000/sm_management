@@ -528,6 +528,7 @@ public class DashboardTester {
     public static void deleteDevice(){
         //id
         //delete
+
     }
 
     public static void searchDevice(){
