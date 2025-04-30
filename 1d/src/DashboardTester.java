@@ -539,6 +539,7 @@ public class DashboardTester {
         if(d == null){
             System.out.println("device invalid");
         }else managementSystem.removeDevice(d);
+        System.out.println("Device is removed!");
     }
 
     public static void searchDevice(){
