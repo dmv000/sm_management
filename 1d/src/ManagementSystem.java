@@ -230,7 +230,7 @@ public class ManagementSystem {
                 sb.append(d.toString() +"\n");
             }
         }
-        return "";
+        return sb.toString();
     }
 
     //More code
