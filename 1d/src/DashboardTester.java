@@ -517,12 +517,12 @@ public class DashboardTester {
                 System.out.print("Is the device noisy? (0=false, 1=true)");
                 boolean noisy = (scan.nextInt() == 1 ? true : false);
                 managementSystem.addDevice(new Appliance(idR, nameR, maxPowerConsumptionR, criticalR, numsArray, noisy), r);
+                System.out.println("Added");
                 break;
             default:
                 System.out.println("Invalid option");
                 break;
         }
-        //add
     }
 
     public static void deleteDevice(){
