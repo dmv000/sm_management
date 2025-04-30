@@ -175,6 +175,7 @@ public class DashboardTester {
                             case 0:
                                 //ok
                                 managementSystem.turnOnDevice(rCode, dId, c);
+                                System.out.println("Device turned on");
                                 break;
                             case 1:
                                 //noisy night
