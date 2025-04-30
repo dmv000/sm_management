@@ -20,6 +20,7 @@ public class DashboardTester {
 
         String userPwd;
         do {
+            //todo cannot be equal to admin pass
             System.out.print("Set the initial User Pass: ");
             userPwd = scan.nextLine();
             if (!ManagementSystem.passwordIsValid(userPwd)) {
@@ -169,9 +170,9 @@ public class DashboardTester {
                     if(device instanceof Appliance){
                         Appliance app = (Appliance) device;
                         int[] levels = app.getPowerLevels();
-                        System.out.print("Available power levels: ");
+                        System.out.print("Available power levels: \n");
                         for (int i = 0; i < levels.length; i++) {
-                            System.out.print(levels[i] + " ");
+                            System.out.print(i+": " + levels[i] + "\n");
                         }
                         System.out.print("\nSelect power level: ");
                         level = scan.nextInt();
@@ -204,7 +205,7 @@ public class DashboardTester {
                         }
                         break;
                     }
-
+                    //0 -->continue
                     boolean onResult;
                     // If a power/brightness level was selected, use turnOn from Device
                     if(customLevel) {
@@ -222,26 +223,6 @@ public class DashboardTester {
                 }
                 System.out.println("Invalid option.");
                 break;
-
-
-            // todo Turn on / Turn off a device done
-                            //check use managementSystem.checkTurnOnDevice()
-                            // if appliance --> turnOn() or turnOn(currentLEvel)
-                            // display the powerLevels array and give the user a choice form one of them
-                            //  the inputted choice should be between 0 and the length of the array(index)
-                            // if light --> turnOn(level) -- between 0 and 100 >> give a choice
-                            // inputted choice is the number
-                            //0 -> no constraints
-                            //turn on
-                            //1 -> noisy and night>> can turn on anyway / standby+waiting list / cancel (ask user)
-                            //turn on
-                            //addDeviceToWaitingListDay();
-                            //exit
-                            //2 -> not enough power --> waitlist / cancel (ask user)
-                            //addDeviceToWaitingListPower();
-                            //exit
-                            //checkTurnOnDevice
-                            //then in its night prompt if you want to turn on or add to waitinglist
             case 9:
                 // Turn off all devices from one specific room
                 System.out.println("Enter room code to turn off all devices: ");
