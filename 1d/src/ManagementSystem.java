@@ -179,7 +179,7 @@ public class ManagementSystem {
     //use a switch for all other conditions
 
     public int checkTurnOnDevice(Device d){
-        if(d.getCurrentConsumption() + getTotalPowerConsumption() >= maxAllowedPower) return 2;
+        if(d.getCurrentConsumption() + getTotalPowerConsumption() > maxAllowedPower) return 2;
         if(d instanceof Appliance){
             if((((Appliance) d).isNoisy()) && !day) return 1;
         }
