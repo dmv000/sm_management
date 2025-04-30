@@ -139,14 +139,14 @@ public class DashboardTester {
                 String rCode = scan.next();
                 Room r = managementSystem.searchRoomByCode(rCode);
                 if(r == null){
-                    System.out.println("invalid room code");
+                    System.out.println("Invalid room code");
                     break;
                 }
                 System.out.print("Enter the device id: ");
                 int dId = scan.nextInt();
                 Device d = managementSystem.searchDeviceById(dId);
                 if(d == null){
-                    System.out.println("invalid device id");
+                    System.out.println("Invalid device id");
                     break;
                 }
                 //light or app
@@ -220,6 +220,7 @@ public class DashboardTester {
                                         System.out.println("Invalid option");
                                         break;
                                 }
+                                break;
                         }
                         break;
                     case 2:
@@ -240,6 +241,7 @@ public class DashboardTester {
                         System.out.println("invalid option, try again;");
                         break;
                 }
+                break;
 
             case 9:
                 // Turn off all devices from one specific room
