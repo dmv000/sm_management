@@ -546,6 +546,7 @@ public class DashboardTester {
         //id
         System.out.print("Enter the id: ");
         int dId = scan.nextInt();
+        //todo? i thing we need to clear the buffer w/ scan.nextLine(); with every nextInt
         Device d = managementSystem.searchDeviceById(dId);
         if(d == null){
             System.out.println("device invalid");
