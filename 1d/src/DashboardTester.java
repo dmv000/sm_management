@@ -499,13 +499,15 @@ public class DashboardTester {
                     int idR = scan.nextInt();
                     System.out.print("Enter name: ");
                     String nameR = scan.next();
-                    System.out.print("Enter max power consumption: "); //todo its looping to infinity
-                    double maxPowerConsumptionR = scan.nextDouble(); //todo its looping to infinity
+                    System.out.print("Enter max power consumption: ");
+                    double maxPowerConsumptionR = scan.nextDouble();
+                    scan.nextLine();
                     System.out.print("Is the device critical? (0=false, 1=true)");
                     boolean criticalR = (scan.nextInt() == 1 ? true : false);
                     System.out.println("enter the power levels, one at a time (-1 to stop)");
                     ArrayList<Integer> nums = new ArrayList<Integer>();
                     int n = scan.nextInt();
+                    scan.nextLine();
                     while (n != -1) {
                         if (n >= 0 && n <= 100)
                             nums.add(n);
@@ -546,7 +548,7 @@ public class DashboardTester {
         //id
         System.out.print("Enter the id: ");
         int dId = scan.nextInt();
-        //todo? i thing we need to clear the buffer w/ scan.nextLine(); with every nextInt
+        scan.nextLine();
         Device d = managementSystem.searchDeviceById(dId);
         if(d == null){
             System.out.println("device invalid");
