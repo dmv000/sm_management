@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.function.DoubleToIntFunction;
+
 public class DashboardTester {
     public final static Scanner scan = new Scanner(System.in);
     private static ManagementSystem managementSystem;
@@ -135,9 +137,17 @@ public class DashboardTester {
                 System.out.print("Enter the room code: ");
                 String rCode = scan.next();
                 Room r = managementSystem.searchRoomByCode(rCode);
+                if(rCode == null){
+                    System.out.println("invalid room code");
+                    break;
+                }
                 System.out.print("Enter the device id: ");
                 int dId = scan.nextInt();
                 Device d = managementSystem.searchDeviceById(dId);
+                if(d == null){
+                    System.out.println("invalid device id");
+                    break;
+                }
                 //light or app
                 int c = 0;
                 if(d instanceof Light){
@@ -450,8 +460,10 @@ public class DashboardTester {
     }
 
     public static void addDevice(){
-        //room
-        //light or app
+        System.out.print("Enter rooom id: ");
+        String roomId = scan.next();
+        System.out.println("Do you want to add a light or an appliance?");
+        System.out.println("");
         //add
     }
 
