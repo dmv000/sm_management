@@ -128,6 +128,7 @@ public class ManagementSystem {
     public void setDayTime(){
         day = true;
         tryToTurnOnDevicesDay();
+
     }
     //setDaytime is prompted, ask user if he wants to turn on all lights in the house or not
     //use method --turnOnAllLightsInHouse()

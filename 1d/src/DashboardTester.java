@@ -367,7 +367,7 @@ public class DashboardTester {
                     if(managementSystem.addRoom(new Room(rCode, rDesc))) {
                         System.out.println("Room added.");
                     } else {
-                        System.out.println("FFFFFF");
+                        System.out.println("Room code already used");
                     }
                 }else if (actionRoom == 2){
                     System.out.print("Enter room code to delete: ");
@@ -495,8 +495,10 @@ public class DashboardTester {
                     boolean critical = (scan.nextInt() == 1 ? true : false);
                     System.out.print("Is the device adjustable? (0=false, 1=true)");
                     boolean adjustable = (scan.nextInt() == 1 ? true : false);
-                    managementSystem.addDevice(new Light(id, name, maxPowerConsumption, critical, adjustable), r);
-                    System.out.println("Added");
+                    int res = managementSystem.addDevice(new Light(id, name, maxPowerConsumption, critical, adjustable), r);
+                    if(res == 0) System.out.println("added");
+                    else if (res == 1) System.out.println("Room is not present");
+                    else if (res == 2) System.out.println("Duplicate device ids, device not added");
                     break;
                 case 2:
                     //appliance
@@ -528,8 +530,10 @@ public class DashboardTester {
                     }
                     System.out.print("Is the device noisy? (0=false, 1=true)");
                     boolean noisy = (scan.nextInt() == 1 ? true : false);
-                    managementSystem.addDevice(new Appliance(idR, nameR, maxPowerConsumptionR, criticalR, numsArray, noisy), r);
-                    System.out.println("Added");
+                    int res2 = managementSystem.addDevice(new Appliance(idR, nameR, maxPowerConsumptionR, criticalR, numsArray, noisy), r);
+                    if(res2 == 0) System.out.println("added");
+                    else if (res2 == 1) System.out.println("Room is not present");
+                    else if (res2 == 2) System.out.println("Duplicate device ids, device not added");
                     break;
                 default:
                     System.out.println("Invalid option");
