@@ -450,4 +450,15 @@ public class ManagementSystem {
         }
         return false;
     }
+
+    public String searchRoomByDevice(Device otherDevice){
+        for(Room room : rooms){
+            for(Device device : room.getDevicesList()){
+                if(device.equals(otherDevice)){
+                    return room.getCode();
+                }
+            }
+        }
+        return null;
+    }
 }

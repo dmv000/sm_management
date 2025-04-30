@@ -527,12 +527,24 @@ public class DashboardTester {
 
     public static void deleteDevice(){
         //id
-        //delete
-
+        System.out.print("Enter the id: ");
+        int dId = scan.nextInt();
+        Device d = managementSystem.searchDeviceById(dId);
+        if(d == null){
+            System.out.println("device invalid");
+        }else managementSystem.removeDevice(d);
     }
 
     public static void searchDevice(){
         //id
-        //search
+        System.out.print("Enter the id: ");
+        int dId = scan.nextInt();
+        Device d = managementSystem.searchDeviceById(dId);
+        if(d == null){
+            System.out.println("device invalid");
+        }else {
+            System.out.println("room code: " + managementSystem.searchRoomByDevice((d)) + "\n");
+            System.out.println(d.toString());
+        }
     }
 }
