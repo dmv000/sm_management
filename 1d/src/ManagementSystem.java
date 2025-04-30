@@ -127,7 +127,13 @@ public class ManagementSystem {
 
     public void setDayTime(){
         day = true;
-        tryToTurnOnDevicesDay();
+        if(tryToTurnOnDevicesDay() == 1){
+            System.out.println("StandBy devices turned on");
+        } else if (tryToTurnOnDevicesDay() == 2){
+            System.out.println("Standby devices put on power standby");
+        } else {
+            System.out.println("No devices turned on");
+        }
 
     }
     //setDaytime is prompted, ask user if he wants to turn on all lights in the house or not
@@ -258,19 +264,25 @@ public class ManagementSystem {
     //More code
 
     //when day is set, check the waitlist and turn on the devices if possible, if not, send it to powerWaitList
-    private void tryToTurnOnDevicesDay(){
+    private int tryToTurnOnDevicesDay(){
         if(waitingListDay.size() != 0){
             for(int i = 0; i < waitingListDay.size(); i++){
                 if(waitingListDay.get(i).getConsumptionIfOn() + getTotalPowerConsumption() <= maxAllowedPower){
                     waitingListDay.get(i).turnOn();
                     waitingListDay.remove(waitingListDay.get(i));
+                    return 1;
                 } else {
                     waitingListPower.add(waitingListDay.get(i));
                     waitingListDay.remove(waitingListDay.get(i));
+                    return 2;
                 }
             }
         }
+        return 0;
     }
+    //0 if no devices turned on
+    //1 if devices turned on
+    //2 if put on waitlist
 
     //normal setter
     public void setMaxAllowedPower(double maxAllowedPower) {
