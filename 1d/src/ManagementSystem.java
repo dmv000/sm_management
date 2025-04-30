@@ -222,8 +222,9 @@ public class ManagementSystem {
 
     public String displayInfo(){
         StringBuilder sb = new StringBuilder();
-        sb.append("Time = " + day + "\n");
+        sb.append("Time = " + (day ? "day" : "night") + "\n");
         sb.append("Max allowed power = " + maxAllowedPower + "\n");
+        sb.append("Current power consumption = " + getTotalPowerConsumption());
         for(Room room : rooms){
             sb.append("Room code " + room.getCode() + ":\n");
             for(Device d : room.getDevicesList()){
@@ -315,7 +316,7 @@ public class ManagementSystem {
             for (int j = 0; j < rooms.get(i).getDevicesList().size(); j++) {
                 if (rooms.get(i).getDevicesList().get(j).getStatus() == Device.ON) {
                     empty = false;
-                    sb.append(rooms.get(i).getDevicesList().get(j).toString());
+                    sb.append(rooms.get(i).getDevicesList().get(j).toString() + "\n");
                 }
             }
         }
