@@ -378,112 +378,7 @@ public class DashboardTester {
                 break;
 
             case 5:
-                //Add/Delete/Search a device
-                System.out.println("1. Add Device\n 2. Delete Device\n 3. Search Device");
-                int actionDevice = scan.nextInt();
-                scan.nextLine();
-
-                if (actionDevice == 1) {
-                    System.out.println("Select type of device to add:\n1. Appliance\n2. Light");
-                    int deviceType = scan.nextInt();
-                    scan.nextLine();
-
-                    // Common properties
-                    System.out.print("Enter device id: ");
-                    int deviceId = scan.nextInt();
-                    scan.nextLine();
-
-                    System.out.print("Enter device name: ");
-                    String deviceName = scan.nextLine();
-
-                    System.out.print("Enter max power consumption: ");
-                    double maxPower = scan.nextDouble();
-                    scan.nextLine();
-
-                    //Input power levels
-                    System.out.println("Enter power levels (0-100), one at a time. Enter -1 to finish:");
-                    ArrayList<Integer> powerList = new ArrayList<>();
-                    while(true){
-                        int lvl = scan.nextInt();
-                        scan.nextLine(); //should this be outside the loop to clear the buffer?todo
-                        if (lvl == -1) break;
-                        if (lvl >= 0 && lvl <= 100) {
-                            powerList.add(lvl);
-                        } else {
-                            System.out.println("Invalid value. Enter a value between 0 and 100, or -1 to finish.");
-                        }
-                    }
-
-                    //this conversion from ArrayList<Integer> to int[] so it is accepted in the constructor
-                    int[] powerLevels = new int[powerList.size()];
-                    for (int i = 0; i < powerList.size(); i++) {
-                        powerLevels[i] = powerList.get(i);
-                    }
-
-                    System.out.print("Is the device critical? (true/false): ");
-                    boolean criticalInput = scan.nextBoolean();
-                    scan.nextLine();
-
-                    Device device = null;
-
-                    if (deviceType == 1) { //for appliance
-                        System.out.print("Is the appliance noisy? (true/false): ");
-                        boolean noisyInput = scan.nextBoolean();
-                        scan.nextLine();
-                        device = new Appliance(deviceId, deviceName, maxPower, noisyInput, powerLevels, criticalInput);
-                    } else if (deviceType == 2) { //for light
-                        System.out.print("Is the light adjustable? (true/false): ");
-                        boolean adjustableInput = scan.nextBoolean();
-                        scan.nextLine();
-                        device = new Light(deviceId, deviceName, maxPower, adjustableInput, powerLevels, criticalInput);
-                    } else {
-                        System.out.println("Invalid device type.");
-                        break;
-                    }
-
-                    System.out.print("Enter room code to add this device: ");
-                    String roomCode = scan.nextLine();
-                    Room room = managementSystem.searchRoomByCode(roomCode);
-
-                    if(room != null && device != null){
-                        int result = managementSystem.addDevice(device, room);
-                        if(result == 0){
-                            System.out.println("Device added.");
-                        }else if(result == 1){
-                            System.out.println("Room not found.");
-                        }else{
-                            System.out.println("Duplicate device id.");
-                        }
-                    }else{
-                        System.out.println("Room not found or invalid device.");
-                    }
-
-                } else if(actionDevice == 2){
-                    System.out.print("Enter device id to delete: ");
-                    int deviceId = scan.nextInt();
-                    scan.nextLine();
-                    Device device = managementSystem.searchDeviceById(deviceId);
-                    if(device != null){
-                        managementSystem.removeDevice(device);
-                        System.out.println("Device deleted.");
-                    }else{
-                        System.out.println("Device not found.");
-                    }
-                } else if(actionDevice == 3){
-                    System.out.print("Enter device id to search: ");
-                    int deviceId = scan.nextInt();
-                    scan.nextLine();
-                    Device device = managementSystem.searchDeviceById(deviceId);
-                    if(device != null){
-                        System.out.println("Device found:\n" + device);
-                    }else{
-                        System.out.println("Device not found.");
-                    }
-                }else{
-                    System.out.println("Invalid option.");
-                }
-                break;
-
+                addDeleteSearchDevice();
             case 6:
                 role = 0;
                 break;
@@ -533,5 +428,40 @@ public class DashboardTester {
         }else {
             System.out.println("Invalid input.");
         }
+    }
+
+    public static void addDeleteSearchDevice(){
+        //Add/Delete/Search a device
+        System.out.println("1. Add Device\n2. Delete Device\n3. Search Device");
+        switch (scan.nextInt()){
+            case 1:
+                addDevice();
+                break;
+            case 2:
+                deleteDevice();
+                break;
+            case 3:
+                searchDevice();
+                break;
+            default:
+                System.out.println("Invalid input");
+                break;
+        }
+    }
+
+    public static void addDevice(){
+        //room
+        //light or app
+        //add
+    }
+
+    public static void deleteDevice(){
+        //id
+        //delete
+    }
+
+    public static void searchDevice(){
+        //id
+        //search
     }
 }
