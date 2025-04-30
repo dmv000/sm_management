@@ -77,7 +77,7 @@ public class ManagementSystem {
     public boolean addRoom(Room r){
         //check if the added room has the same id to prevent code duplicates
         for(Room room : rooms){
-            if(r.getCode().equals(r.getCode())) return false;
+            if(r.getCode().equals(room.getCode())) return false;
         }
         rooms.add(r);
         return true;

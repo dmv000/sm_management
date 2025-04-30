@@ -133,7 +133,7 @@ public class DashboardTester {
                 break;
             case 8:
                 //Turn on / Turn off a device
-                System.out.println("Do you want to:\n1. Turn on a device\n2. Turn off a device\n");
+                System.out.print("Do you want to:\n1. Turn on a device\n other. Turn off a device\n");
                 int choice = scan.nextInt();
                 System.out.print("Enter the room code: ");
                 String rCode = scan.next();
@@ -224,7 +224,7 @@ public class DashboardTester {
                                 break;
                         }
                         break;
-                    case 2:
+                    default:
                         //OFF
                         if(d.isCritical()){
                             System.out.println("Device is critical. Please enter admin password to procceed.");
@@ -239,9 +239,6 @@ public class DashboardTester {
                             managementSystem.turnOffDevice(d);
                             System.out.println("device is off");
                         }
-                        break;
-                    default:
-                        System.out.println("invalid option, try again;");
                         break;
                 }
                 break;
@@ -367,8 +364,11 @@ public class DashboardTester {
                     String rCode = scan.nextLine();
                     System.out.print("Enter room description: ");
                     String rDesc = scan.nextLine();
-                    managementSystem.addRoom(new Room(rCode, rDesc));
-                    System.out.println("Room added.");
+                    if(managementSystem.addRoom(new Room(rCode, rDesc))) {
+                        System.out.println("Room added.");
+                    } else {
+                        System.out.println("FFFFFF");
+                    }
                 }else if (actionRoom == 2){
                     System.out.print("Enter room code to delete: ");
                     String code = scan.nextLine();
@@ -407,7 +407,6 @@ public class DashboardTester {
     public static void setDayNightMode(){
         System.out.print("Set mode 1 to Day or 2 to Night: ");
         int dayNight = scan.nextInt();
-        scan.nextLine();
         if(dayNight == 1){
             managementSystem.setDayTime();
             System.out.println("System set to day mode.");
@@ -476,58 +475,66 @@ public class DashboardTester {
         System.out.print("Enter room id: ");
         String roomId = scan.next();
         Room r = managementSystem.searchRoomByCode(roomId);
-        System.out.println("Do you want to add a light or an appliance?");
-        System.out.println("1. light, 2. appliance");
-        System.out.print("Enter your choice: ");
-        int c = scan.nextInt();
-        switch(c){
-            case 1:
-                //light
-                System.out.print("Enter id: ");
-                int id = scan.nextInt();
-                System.out.print("Enter name: ");
-                String name = scan.next();
-                System.out.print("Enter max power consumption: ");
-                double maxPowerConsumption = scan.nextDouble();
-                System.out.print("Is the device critical? (0=false, 1=true)");
-                boolean critical = (scan.nextInt() == 1 ? true : false);
-                System.out.print("Is the device adjustable? (0=false, 1=true)");
-                boolean adjustable = (scan.nextInt() == 1 ? true : false);
-                managementSystem.addDevice(new Light(id, name, maxPowerConsumption, critical, adjustable), r);
-                System.out.println("Added");
-                break;
-            case 2:
-                //appliance
-                System.out.print("Enter id: ");
-                int idR = scan.nextInt();
-                System.out.print("Enter name: ");
-                String nameR = scan.next();
-                System.out.print("Enter max power consumption: ");
-                double maxPowerConsumptionR = scan.nextDouble();
-                System.out.print("Is the device critical? (0=false, 1=true)");
-                boolean criticalR = (scan.nextInt() == 1 ? true : false);
-                System.out.println("enter the power levels, one at a time (-1 to stop)");
-                ArrayList<Integer> nums= new ArrayList<Integer>();
-                int n = scan.nextInt();
-                while(n != -1){
-                    if(n >= 0 && n <= 100) nums.add(n);
-                    else{
-                        System.out.println("Invalid");
-                        continue;
+        if(r == null) {
+            System.out.println("Invalid room");
+        } else {
+            System.out.println("Do you want to add a light or an appliance?");
+            System.out.println("1. light, 2. appliance");
+            System.out.print("Enter your choice: ");
+            int c = scan.nextInt();
+            switch(c) {
+                case 1:
+                    //light
+                    System.out.print("Enter id: ");
+                    int id = scan.nextInt();
+                    System.out.print("Enter name: ");
+                    String name = scan.next();
+                    System.out.print("Enter max power consumption: ");
+                    double maxPowerConsumption = scan.nextDouble();
+                    System.out.print("Is the device critical? (0=false, 1=true)");
+                    boolean critical = (scan.nextInt() == 1 ? true : false);
+                    System.out.print("Is the device adjustable? (0=false, 1=true)");
+                    boolean adjustable = (scan.nextInt() == 1 ? true : false);
+                    managementSystem.addDevice(new Light(id, name, maxPowerConsumption, critical, adjustable), r);
+                    System.out.println("Added");
+                    break;
+                case 2:
+                    //appliance
+                    System.out.print("Enter id: ");
+                    int idR = scan.nextInt();
+                    System.out.print("Enter name: ");
+                    String nameR = scan.next();
+                    System.out.print("Enter max power consumption: ");
+                    double maxPowerConsumptionR = scan.nextDouble();
+                    scan.nextLine();
+                    System.out.print("Is the device critical? (0=false, 1=true)");
+                    boolean criticalR = (scan.nextInt() == 1 ? true : false);
+                    System.out.println("enter the power levels, one at a time (-1 to stop)");
+                    ArrayList<Integer> nums = new ArrayList<Integer>();
+                    int n = scan.nextInt();
+                    scan.nextLine();
+                    while (n != -1) {
+                        if (n >= 0 && n <= 100)
+                            nums.add(n);
+                        else {
+                            System.out.println("Invalid");
+                            continue;
+                        }
+                        n = scan.nextInt();
                     }
-                }
-                int[] numsArray = new int[nums.size()];
-                for(int i : numsArray){
-                    i = nums.get(i);
-                }
-                System.out.print("Is the device noisy? (0=false, 1=true)");
-                boolean noisy = (scan.nextInt() == 1 ? true : false);
-                managementSystem.addDevice(new Appliance(idR, nameR, maxPowerConsumptionR, criticalR, numsArray, noisy), r);
-                System.out.println("Added");
-                break;
-            default:
-                System.out.println("Invalid option");
-                break;
+                    int[] numsArray = new int[nums.size()];
+                    for (int i = 0; i < numsArray.length; i++) {
+                        numsArray[i] = nums.get(i);
+                    }
+                    System.out.print("Is the device noisy? (0=false, 1=true)");
+                    boolean noisy = (scan.nextInt() == 1 ? true : false);
+                    managementSystem.addDevice(new Appliance(idR, nameR, maxPowerConsumptionR, criticalR, numsArray, noisy), r);
+                    System.out.println("Added");
+                    break;
+                default:
+                    System.out.println("Invalid option");
+                    break;
+            }
         }
     }
 
@@ -539,18 +546,19 @@ public class DashboardTester {
         if(d == null){
             System.out.println("device invalid");
         }else managementSystem.removeDevice(d);
+        System.out.println("Device is removed!");
     }
 
     public static void searchDevice(){
         //id
         System.out.print("Enter the id: ");
         int dId = scan.nextInt();
+        scan.nextLine();
         Device d = managementSystem.searchDeviceById(dId);
         if(d == null){
             System.out.println("device invalid");
         }else {
-            System.out.println("room code: " + managementSystem.searchRoomByDevice((d)) + "\n");
-            System.out.println(d.toString());
+            System.out.println(d.toString() + " room code: " + managementSystem.searchRoomByDevice((d)));
         }
     }
 }
