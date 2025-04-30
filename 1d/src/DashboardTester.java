@@ -407,7 +407,6 @@ public class DashboardTester {
     public static void setDayNightMode(){
         System.out.print("Set mode 1 to Day or 2 to Night: ");
         int dayNight = scan.nextInt();
-        scan.nextLine();
         if(dayNight == 1){
             managementSystem.setDayTime();
             System.out.println("System set to day mode.");
