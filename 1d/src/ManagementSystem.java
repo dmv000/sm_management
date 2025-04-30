@@ -131,10 +131,7 @@ public class ManagementSystem {
             System.out.println("StandBy devices turned on");
         } else if (tryToTurnOnDevicesDay() == 2){
             System.out.println("Standby devices put on power standby");
-        } else {
-            System.out.println("No devices turned on");
         }
-
     }
     //setDaytime is prompted, ask user if he wants to turn on all lights in the house or not
     //use method --turnOnAllLightsInHouse()
