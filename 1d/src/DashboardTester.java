@@ -149,27 +149,27 @@ public class DashboardTester {
                     System.out.println("Invalid device id");
                     break;
                 }
-                //light or app
-                int c = 0;
-                if(d instanceof Light){
-                    if(!((Light)d).isAdjustable()){
-                        c = 100;
-                    } else {
-                        System.out.print("Enter the brightness level: ");
-                        c = scan.nextInt();
-                    }
-                } else {
-                    System.out.println("Enter the power level from the below:");
-                    int[] levels = ((Appliance)d).getPowerLevels();
-                    for(int i = 0; i<levels.length; i++){
-                        System.out.println(i +". " + levels[i]);
-                    }
-                    c = scan.nextInt();
-                    if(c >= levels.length) c = levels.length-1;
-                    if(c < 0) c = 0;
-                }
                 switch(choice){
                     case 1:
+                        //light or app
+                        int c = 0;
+                        if(d instanceof Light){
+                            if(!((Light)d).isAdjustable()){
+                                c = 100;
+                            } else {
+                                System.out.print("Enter the brightness level: ");
+                                c = scan.nextInt();
+                            }
+                        } else {
+                            System.out.println("Enter the power level from the below:");
+                            int[] levels = ((Appliance)d).getPowerLevels();
+                            for(int i = 0; i<levels.length; i++){
+                                System.out.println(i +". " + levels[i]);
+                            }
+                            c = scan.nextInt();
+                            if(c >= levels.length) c = levels.length-1;
+                            if(c < 0) c = 0;
+                        }
                         //ON
                         switch(managementSystem.checkTurnOnDevice(d)){
                             case 0:
@@ -230,12 +230,14 @@ public class DashboardTester {
                             System.out.println("Device is critical. Please enter admin password to procceed.");
                             if(ManagementSystem.passwordIsValid(scan.next())){
                                 managementSystem.turnOffDevice(d);
+                                System.out.println("device is off");
                             } else {
                                 System.out.println("Invalid password! Unable to turn off!");
                             }
                             break;
                         } else {
                             managementSystem.turnOffDevice(d);
+                            System.out.println("device is off");
                         }
                         break;
                     default:
