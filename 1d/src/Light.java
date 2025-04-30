@@ -33,16 +33,6 @@ public class Light extends Device{
         }
     }
 
-    //nonadjustable lights cannot be turned on or off and
-
-    // -----this might need to have sort of an @override or @overload method----
-    //----for the set level of the adjustable light, non_adjustable lights, and the default one----
-
-    //constantly stay at the same level
-    //may add feature for the turn off function to save previous level
-    //so that it the methods can be used
-    //to be determined later
-
     public void turnOn(){
         setStatus(ON);
         if(adjustable) level = 100;
@@ -55,6 +45,10 @@ public class Light extends Device{
 
     public double getCurrentConsumption() {
         return (getStatus() == ON) ? (level/100.0) * getMaxPowerConsumption() : 0;
+    }
+
+    public double getConsumptionIfOn() {
+        return (level/100.0) * getMaxPowerConsumption();
     }
 
     public String toString(){

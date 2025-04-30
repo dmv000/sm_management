@@ -77,6 +77,9 @@ public abstract class Device{
     public abstract double getCurrentConsumption();
     //return power if ON and 0 if OFF
 
+    public abstract double getConsumptionIfOn();
+    //returns power consumption if the device is on
+
     public boolean equals(Device d){
         return id == d.getId();
     }

@@ -411,6 +411,12 @@ public class DashboardTester {
         if(dayNight == 1){
             managementSystem.setDayTime();
             System.out.println("System set to day mode.");
+            if(managementSystem.anyLightIsOn()){
+                System.out.println("Looks like the lights are still on! do you want to turn them off?");
+                System.out.println("1 = yes, other = no");
+                System.out.print("Input your choice: ");
+                if(scan.nextInt() == 1) managementSystem.turnOffAllLightsInHouse(); else System.out.println("Lights kept on");
+            }
         }else if(dayNight == 2){
             managementSystem.setNightTime();
             if (managementSystem.checkForRunningNoisyDevices()){

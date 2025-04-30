@@ -54,6 +54,11 @@ public class Appliance extends Device{
 
     }
 
+    public double getConsumptionIfOn() {
+        return (powerLevels[currentLevel]/100.0) * getMaxPowerConsumption();
+
+    }
+
     public String toString(){
         String s = "Appliance{" + super.toString() + ", power levels = {[";
         for(int i = 0; i < powerLevels.length; i++)

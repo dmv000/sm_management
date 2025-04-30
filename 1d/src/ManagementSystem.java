@@ -179,7 +179,7 @@ public class ManagementSystem {
     //use a switch for all other conditions
 
     public int checkTurnOnDevice(Device d){
-        if(d.getCurrentConsumption() + getTotalPowerConsumption() > maxAllowedPower) return 2;
+        if(d.getConsumptionIfOn() + getTotalPowerConsumption() > maxAllowedPower) return 2;
         if(d instanceof Appliance){
             if((((Appliance) d).isNoisy()) && !day) return 1;
         }
@@ -260,7 +260,7 @@ public class ManagementSystem {
     private void tryToTurnOnDevicesDay(){
         if(waitingListDay.size() != 0){
             for(int i = 0; i < waitingListDay.size(); i++){
-                if(waitingListDay.get(i).getCurrentConsumption() + getTotalPowerConsumption() <= maxAllowedPower){
+                if(waitingListDay.get(i).getConsumptionIfOn() + getTotalPowerConsumption() <= maxAllowedPower){
                     waitingListDay.get(i).turnOn();
                     waitingListDay.remove(waitingListDay.get(i));
                 } else {
@@ -299,7 +299,7 @@ public class ManagementSystem {
     private void tryToTurnOnDevicesPower(){
         if(waitingListPower.size() != 0){
             for(int i = 0; i < waitingListPower.size(); i++) {
-                if (waitingListPower.get(i).getCurrentConsumption() + getTotalPowerConsumption() <= maxAllowedPower) {
+                if (waitingListPower.get(i).getConsumptionIfOn() + getTotalPowerConsumption() <= maxAllowedPower) {
                     waitingListPower.get(i).turnOn();
                     waitingListPower.remove(waitingListPower.get(i));
                 }
@@ -307,11 +307,11 @@ public class ManagementSystem {
         }
     }
 
-    public void turnOnAllLightsInHouse(){
+    public void turnOffAllLightsInHouse(){
         for(int i = 0; i < rooms.size(); i++){
             for(int j = 0; j < rooms.get(i).getDevicesList().size(); j++){
                 if(rooms.get(i).getDevicesList().get(j) instanceof Light)
-                    rooms.get(i).getDevicesList().get(j).turnOn();
+                    rooms.get(i).getDevicesList().get(j).turnOff();
             }
         }
     }
@@ -460,5 +460,16 @@ public class ManagementSystem {
             }
         }
         return null;
+    }
+
+    public boolean anyLightIsOn(){
+        for(Room room : rooms){
+            for(Device d : room.getDevicesList()){
+                if(d instanceof Light){
+                    if(d.getStatus() == Device.ON) return true;
+                }
+            }
+        }
+        return false;
     }
 }
