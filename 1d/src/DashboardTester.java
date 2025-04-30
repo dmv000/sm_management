@@ -1,3 +1,4 @@
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.function.DoubleToIntFunction;
@@ -460,10 +461,60 @@ public class DashboardTester {
     }
 
     public static void addDevice(){
-        System.out.print("Enter rooom id: ");
+        System.out.print("Enter room id: ");
         String roomId = scan.next();
+        Room r = managementSystem.searchRoomByCode(roomId);
         System.out.println("Do you want to add a light or an appliance?");
-        System.out.println("");
+        System.out.println("1. light, 2. appliance");
+        System.out.print("Enter your choice: ");
+        int c = scan.nextInt();
+        switch(c){
+            case 1:
+                //light
+                System.out.print("Enter id: ");
+                int id = scan.nextInt();
+                System.out.print("Enter name: ");
+                String name = scan.next();
+                System.out.print("Enter max power consumption: ");
+                double maxPowerConsumption = scan.nextDouble();
+                System.out.print("Is the device critical? (0=false, 1=true)");
+                boolean critical = (scan.nextInt() == 1 ? true : false);
+                System.out.print("Is the device adjustable? (0=false, 1=true)");
+                boolean adjustable = (scan.nextInt() == 1 ? true : false);
+                managementSystem.addDevice(new Light(id, name, maxPowerConsumption, critical, adjustable), r);
+                break;
+            case 2:
+                //appliance
+                System.out.print("Enter id: ");
+                int idR = scan.nextInt();
+                System.out.print("Enter name: ");
+                String nameR = scan.next();
+                System.out.print("Enter max power consumption: ");
+                double maxPowerConsumptionR = scan.nextDouble();
+                System.out.print("Is the device critical? (0=false, 1=true)");
+                boolean criticalR = (scan.nextInt() == 1 ? true : false);
+                System.out.println("enter the power levels, one at a time (-1 to stop)");
+                ArrayList<Integer> nums= new ArrayList<Integer>();
+                int n = scan.nextInt();
+                while(n != -1){
+                    if(n >= 0 && n <= 100) nums.add(n);
+                    else{
+                        System.out.println("Invalid");
+                        continue;
+                    }
+                }
+                int[] numsArray = new int[nums.size()];
+                for(int i : numsArray){
+                    i = nums.get(i);
+                }
+                System.out.print("Is the device noisy? (0=false, 1=true)");
+                boolean noisy = (scan.nextInt() == 1 ? true : false);
+                managementSystem.addDevice(new Appliance(idR, nameR, maxPowerConsumptionR, criticalR, numsArray, noisy), r);
+                break;
+            default:
+                System.out.println("Invalid option");
+                break;
+        }
         //add
     }
 
