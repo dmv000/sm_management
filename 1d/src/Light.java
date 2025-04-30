@@ -12,6 +12,7 @@ public class Light extends Device{
         super(id, name, maxPowerConsumption, critical);
         setAdjustable(adjustable);
         setLevel(100);
+
     }
 
     public void setAdjustable(boolean adjustable) {
