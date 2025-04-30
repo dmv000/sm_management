@@ -20,13 +20,15 @@ public class DashboardTester {
 
         String userPwd;
         do {
-            //todo cannot be equal to admin pass
             System.out.print("Set the initial User Pass: ");
             userPwd = scan.nextLine();
             if (!ManagementSystem.passwordIsValid(userPwd)) {
                 System.out.println("Password must be at least 8 characters long and include uppercase, lowercase, digit, and special character.");
             }
-        } while (!ManagementSystem.passwordIsValid(userPwd));
+            if(userPwd.equals(adminPwd)){
+                System.out.println("User password and admin password have to be different!");
+            }
+        } while (!ManagementSystem.passwordIsValid(userPwd) && !userPwd.equals(adminPwd));
         managementSystem = new ManagementSystem(adminPwd, userPwd);
 
         //Roles admin/user/exit to main menu
@@ -128,101 +130,87 @@ public class DashboardTester {
                 break;
             case 8:
                 //Turn on / Turn off a device
-                System.out.print("Enter room code: ");
-                roomCode = scan.nextLine();
-                Room room = managementSystem.searchRoomByCode(roomCode);
-                if(room == null){
-                    System.out.println("Room not found.");
-                    break;
-                }
-
-                System.out.print("Enter device ID: ");
-                deviceId = scan.nextInt();
-                scan.nextLine();
-                Device device = room.searchDeviceById(deviceId);
-                if(device == null){
-                    System.out.println("Device not found.");
-                    break;
-                }
-
-                System.out.print("Turn ON (1) or OFF (2)? ");
-                action = scan.nextInt();
-                scan.nextLine();
-                // Turn OFF
-                if(action == 2){
-                    if (device.isCritical()) {
-                        System.out.print("this device is critical please enter admin password to proceed: ");
-                        String adminPwd = scan.nextLine();
-                        if (!ManagementSystem.passwordIsValid(adminPwd)) {
-                            System.out.println("Invalid admin password. Cannot turn off critical device.");
+                System.out.println("Do you want to:\n1. Turn on a device\n2. Turn off a device\n");
+                int choice = scan.nextInt();
+                System.out.print("Enter the room code: ");
+                String rCode = scan.next();
+                Room r = managementSystem.searchRoomByCode(rCode);
+                System.out.print("Enter the device id: ");
+                int dId = scan.nextInt();
+                Device d = managementSystem.searchDeviceById(dId);
+                switch(choice){
+                    case 1:
+                        //ON
+                        switch(managementSystem.checkTurnOnDevice(d)){
+                            case 0:
+                                //ok
+                                managementSystem.turnOnDevice(rCode, dId);
+                                break;
+                            case 1:
+                                //noisy night
+                                System.out.println("the device is noisy and it's night");
+                                System.out.println("What do you want to do?");
+                                System.out.println("1. Turn on anyways");
+                                System.out.println("2. Put the device on standby");
+                                System.out.println("3. Dont turn on the device");
+                                System.out.print("Enter your choice: ");
+                                switch(scan.nextInt()){
+                                    case 1:
+                                        managementSystem.turnOnDevice(rCode, dId);
+                                        System.out.println("Device turned on");
+                                        break;
+                                    case 2:
+                                        managementSystem.addDeviceToWaitingListDay(d);
+                                        System.out.println("Device added to wait list");
+                                        break;
+                                    case 3:
+                                        System.out.println("Cancelled order!");
+                                        break;
+                                    default:
+                                        System.out.println("Invalid option!");
+                                        break;
+                                }
+                                break;
+                            case 2:
+                                // not enoigh power
+                                System.out.println("Not enough power!");
+                                System.out.println("What do you want to do?");
+                                System.out.println("1. add device to waitlist");
+                                System.out.println("2. cancel");
+                                System.out.print("Enter your choice: ");
+                                switch (scan.nextInt()){
+                                    case 1:
+                                        managementSystem.addDeviceToWaitingListPower(d);
+                                        System.out.println("Device added to waitlist");
+                                        break;
+                                    case 2:
+                                        System.out.println("Cancelled order!");
+                                        break;
+                                    default:
+                                        System.out.println("Invalid option");
+                                        break;
+                                }
+                        }
+                        break;
+                    case 2:
+                        //OFF
+                        if(d.isCritical()){
+                            System.out.println("Device is critical. Please enter admin password to procceed.");
+                            if(ManagementSystem.passwordIsValid(scan.next())){
+                                managementSystem.turnOffDevice(d);
+                            } else {
+                                System.out.println("Invalid password! Unable to turn off!");
+                            }
                             break;
-                        }
-                    }
-                    //this is to check and edit the device on/off
-                    boolean offResult = managementSystem.turnOffDevice(roomCode, deviceId);
-                    System.out.println(offResult ? "Device turned off." : "Failed to turn off device.");
-                    break;
-                // Turn ON
-                }else if(action == 1){
-                    int level = -1;
-                    boolean customLevel = false;
-
-                    if(device instanceof Appliance){
-                        Appliance app = (Appliance) device;
-                        int[] levels = app.getPowerLevels();
-                        System.out.print("Available power levels: \n");
-                        for (int i = 0; i < levels.length; i++) {
-                            System.out.print(i+": " + levels[i] + "\n");
-                        }
-                        System.out.print("\nSelect power level: ");
-                        level = scan.nextInt();
-                        scan.nextLine();
-                        customLevel = true;
-                    }else if(device instanceof Light && ((Light) device).isAdjustable()){
-                        System.out.print("Enter brightness level: ");
-                        level = scan.nextInt();
-                        scan.nextLine();
-                        customLevel = true;
-                    }
-                    int check = managementSystem.checkTurnOnDevice(device);
-
-                    //noisy and night
-                    if(check == 1){
-                        System.out.println("the device is noisy and cannot be turned on at night.");
-                        System.out.print("do you want to add to waiting list for day? (Y/N): ");
-                        if (scan.nextLine().trim().equalsIgnoreCase("Y")) {
-                            managementSystem.addDeviceToWaitingListDay(device);
-                            System.out.println("Device added to waiting list for day.");
+                        } else {
+                            managementSystem.turnOffDevice(d);
                         }
                         break;
-                        //power waiting list
-                    } else if (check == 2) {
-                        System.out.println("there is not enough power to turn on device.");
-                        System.out.print("do you want to add to waiting list for power? (Y/N): ");
-                        if (scan.nextLine().trim().equalsIgnoreCase("Y")) {
-                            managementSystem.addDeviceToWaitingListPower(device);
-                            System.out.println("Device added to waiting list for power.");
-                        }
+                    default:
+                        System.out.println("invalid option, try again;");
                         break;
-                    }
-                    //0 -->continue
-                    boolean onResult;
-                    // If a power/brightness level was selected, use turnOn from Device
-                    if(customLevel) {
-                        if(device instanceof Appliance)
-                            ((Appliance) device).turnOn(level);
-                        else if(device instanceof Light)
-                            ((Light) device).turnOn(level);
-                        onResult = true;
-                    }else{
-                        onResult = managementSystem.turnOnDevice(roomCode, deviceId);
-                    }
-
-                    System.out.println(onResult ? "Device turned on." : "Failed to turn on device.");
-                    break;
                 }
-                System.out.println("Invalid option.");
-                break;
+
             case 9:
                 // Turn off all devices from one specific room
                 System.out.println("Enter room code to turn off all devices: ");

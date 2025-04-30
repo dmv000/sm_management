@@ -224,7 +224,7 @@ public class ManagementSystem {
         StringBuilder sb = new StringBuilder();
         sb.append("Time = " + (day ? "day" : "night") + "\n");
         sb.append("Max allowed power = " + maxAllowedPower + "\n");
-        sb.append("Current power consumption = " + getTotalPowerConsumption());
+        sb.append("Current power consumption = " + getTotalPowerConsumption() +"\n");
         for(Room room : rooms){
             sb.append("Room code " + room.getCode() + ":\n");
             for(Device d : room.getDevicesList()){
