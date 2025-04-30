@@ -390,6 +390,7 @@ public class DashboardTester {
 
             case 5:
                 addDeleteSearchDevice();
+                break;
             case 6:
                 role = 0;
                 break;
@@ -482,6 +483,7 @@ public class DashboardTester {
                 System.out.print("Is the device adjustable? (0=false, 1=true)");
                 boolean adjustable = (scan.nextInt() == 1 ? true : false);
                 managementSystem.addDevice(new Light(id, name, maxPowerConsumption, critical, adjustable), r);
+                System.out.println("Added");
                 break;
             case 2:
                 //appliance
