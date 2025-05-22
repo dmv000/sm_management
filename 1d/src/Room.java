@@ -1,9 +1,9 @@
 import java.util.ArrayList;
 
 public class Room {
-    String code;
-    String description;
-    ArrayList<Device> devicesList;
+    private String code;
+    private String description;
+    private ArrayList<Device> devicesList;
 
     public Room(String code, String description){
         setCode(code);
@@ -76,12 +76,13 @@ public class Room {
     }
 
     public String toString(){
-        String s = getCode() +"/" +getDescription() +":\n"
-                +"Devices: \n";
-        for(int i = 0; i < devicesList.size(); i++){
-            s += devicesList.get(i).toString() + "\n";
+        StringBuilder sb = new StringBuilder();
+        sb.append(getCode()).append("/").append(getDescription()).append(":\n");
+        sb.append("Devices: \n");
+        for(Device device : devicesList){
+            sb.append(device.toString()).append("\n");
         }
-        return s;
+        return sb.toString();
     }
 
     public String toBreifString(){

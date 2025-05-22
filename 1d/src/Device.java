@@ -25,10 +25,11 @@ public abstract class Device{
     }
 
     public void setId(int id) {
-        if (id>=100 && id <= 999) this.id = id;
-        else this.id = 0;
+        if (id < 100 || id > 999) {
+            throw new IllegalArgumentException("Device ID must be between 100 and 999.");
+        }
+        this.id = id;
     }
-    //check that ids are not identical
 
     public int getId() {
         return id;
@@ -52,8 +53,10 @@ public abstract class Device{
 
 
     public void setMaxPowerConsumption(double maxPowerConsumption) {
-        if(maxPowerConsumption >= 0) this.maxPowerConsumption = maxPowerConsumption;
-        else this.maxPowerConsumption = 50;
+        if (maxPowerConsumption < 0) {
+            throw new IllegalArgumentException("Maximum power consumption cannot be negative.");
+        }
+        this.maxPowerConsumption = maxPowerConsumption;
     }
     public double getMaxPowerConsumption() {
         return maxPowerConsumption;
@@ -70,7 +73,6 @@ public abstract class Device{
     public abstract void turnOn();
 
     public void turnOff(){
-        //add double confirmation somehow
         setStatus(OFF);
     }
 
@@ -84,12 +86,19 @@ public abstract class Device{
         return id == d.getId();
     }
 
-    public String toString(){
-        return "id = " + id + ", name = " + name + ", status: "
-                + ((status == OFF) ? "Off" : (status == ON) ? "On" : "Standby")
-                + ", maximum power consumption = " + maxPowerConsumption + ", "
-                + ((critical) ? "critical" : "not critical");
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("id = ").append(id);
+        sb.append(", name = ").append(name);
+        sb.append(", status: ");
+        switch (status) {
+            case OFF: sb.append("Off"); break;
+            case ON: sb.append("On"); break;
+            case STANDBY: sb.append("Standby"); break;
+            default: sb.append("Unknown"); break; // Should not happen
+        }
+        sb.append(", maximum power consumption = ").append(maxPowerConsumption);
+        sb.append(", ").append(critical ? "critical" : "not critical");
+        return sb.toString();
     }
-
-
 }
