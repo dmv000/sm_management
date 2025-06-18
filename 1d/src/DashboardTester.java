@@ -1,62 +1,156 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.function.DoubleToIntFunction;
 
 public class DashboardTester {
     public final static Scanner scan = new Scanner(System.in);
     private static ManagementSystem managementSystem;
-    //0 = not logged in; 1 = user login; 2 = admin login
-    //(role) is a method in managementsystem class
-    private static int role = 0;
+    private static int currentAccessLevel = 0; // 0 = not logged in; 1 = user login; 2 = admin login
+
+    private static void handleTurnOnDevice(String roomCodeInput, int deviceIdInput, Device targetDevice) {
+        int levelOrChoice = 0;
+        if(targetDevice instanceof Light){
+            Light targetLight = (Light) targetDevice;
+            if(!targetLight.isAdjustable()){
+                levelOrChoice = 100; // Default for non-adjustable
+            } else {
+                levelOrChoice = readIntInput("Enter the brightness level (0-100): ");
+            }
+        } else if (targetDevice instanceof Appliance) {
+            Appliance targetAppliance = (Appliance) targetDevice;
+            System.out.println("Enter the power level index from the below:");
+            int[] powerLevelsArray = targetAppliance.getPowerLevels();
+            if (powerLevelsArray == null || powerLevelsArray.length == 0) {
+                System.out.println("No power levels defined for this appliance. Cannot turn on.");
+                return;
+            }
+            for(int i = 0; i < powerLevelsArray.length; i++){
+                System.out.println(i + ". " + powerLevelsArray[i]);
+            }
+            levelOrChoice = readIntInput("Select power level index: ");
+            if(levelOrChoice >= powerLevelsArray.length) levelOrChoice = powerLevelsArray.length - 1; // Corrected to prevent out of bounds
+            if(levelOrChoice < 0) levelOrChoice = 0;
+        }
+
+        // Check device turn-on conditions
+        switch(managementSystem.checkTurnOnDevice(targetDevice)){
+            case 0: // OK
+                managementSystem.turnOnDevice(roomCodeInput, deviceIdInput, levelOrChoice);
+                System.out.println("Device turned on successfully.");
+                break;
+            case 1: // Noisy and night
+                System.out.println("The device is noisy and it's currently night time.");
+                System.out.println("Options:\n1. Turn on anyway\n2. Put on standby (day waiting list)\n3. Cancel operation");
+                int noisyNightChoice = readIntInput("Enter your choice: ");
+                if (noisyNightChoice == 1) {
+                    managementSystem.turnOnDevice(roomCodeInput, deviceIdInput, levelOrChoice);
+                    System.out.println("Device turned on successfully.");
+                } else if (noisyNightChoice == 2) {
+                    managementSystem.addDeviceToWaitingListDay(targetDevice);
+                    System.out.println("Device added to day waiting list.");
+                } else {
+                    System.out.println("Operation cancelled by user.");
+                }
+                break;
+            case 2: // Not enough power
+                System.out.println("Not enough power available to turn on this device.");
+                System.out.println("Options:\n1. Add to power waiting list\n2. Cancel operation");
+                int powerIssueChoice = readIntInput("Enter your choice: ");
+                if (powerIssueChoice == 1) {
+                    managementSystem.addDeviceToWaitingListPower(targetDevice);
+                    System.out.println("Device added to power waiting list.");
+                } else {
+                    System.out.println("Operation cancelled by user.");
+                }
+                break;
+            default:
+                System.out.println("Unknown condition preventing device turn on. Please check system status.");
+                break;
+        }
+    }
+
+    private static void handleTurnOffDevice(Device targetDevice) {
+        if(targetDevice.isCritical()){
+            System.out.print("Device is critical. Please enter admin password to proceed: ");
+            String adminPasswordAttempt = scan.nextLine();
+            if(managementSystem.checkAccess(adminPasswordAttempt) == ManagementSystem.ADMIN){
+                managementSystem.turnOffDevice(targetDevice);
+                System.out.println("Critical device turned off successfully.");
+            } else {
+                System.out.println("Incorrect admin password. Unable to turn off critical device.");
+            }
+        } else {
+            managementSystem.turnOffDevice(targetDevice);
+            System.out.println("Device turned off successfully.");
+        }
+    }
 
     public static void main(String[] args) {
-        //prompt and check the adminn and user password to be true and stores it
-        String adminPwd;
+        // Prompt for and validate initial admin and user passwords
+        String adminPasswordInput;
         do {
-            System.out.print("Set the initial Admin pass: ");
-            adminPwd = scan.nextLine();
-            if (!ManagementSystem.passwordIsValid(adminPwd)) {
-                System.out.println("Password must be at least 8 characters long and include uppercase, lowercase, digit, and special character.");
+            System.out.print("Set the initial Admin password: ");
+            adminPasswordInput = scan.nextLine();
+            if (!ManagementSystem.passwordIsValid(adminPasswordInput)) {
+                System.out.println("Admin password must be at least 8 characters long and include an uppercase letter, a lowercase letter, and a digit.");
             }
-        } while (!ManagementSystem.passwordIsValid(adminPwd));
+        } while (!ManagementSystem.passwordIsValid(adminPasswordInput));
 
-        String userPwd;
+        String userPasswordInput;
         do {
-            System.out.print("Set the initial User Pass: ");
-            userPwd = scan.nextLine();
-            if (!ManagementSystem.passwordIsValid(userPwd)) {
-                System.out.println("Password must be at least 8 characters long and include uppercase, lowercase, digit, and special character.");
-            }
-            if(userPwd.equals(adminPwd)){
-                System.out.println("User password and admin password have to be different!");
-            }
-        } while (!ManagementSystem.passwordIsValid(userPwd) && !userPwd.equals(adminPwd));
-        managementSystem = new ManagementSystem(adminPwd, userPwd);
+            System.out.print("Set the initial User password: ");
+            userPasswordInput = scan.nextLine();
+            boolean isValidFormat = ManagementSystem.passwordIsValid(userPasswordInput);
+            boolean isDifferentFromAdmin = !userPasswordInput.equals(adminPasswordInput);
 
-        //Roles admin/user/exit to main menu
+            if (!isValidFormat) {
+                System.out.println("User password must be at least 8 characters long and include an uppercase letter, a lowercase letter, and a digit.");
+            }
+            if (isValidFormat && !isDifferentFromAdmin) {
+                System.out.println("User password must be different from the Admin password.");
+            }
+        } while (!ManagementSystem.passwordIsValid(userPasswordInput) || userPasswordInput.equals(adminPasswordInput));
+        try {
+            managementSystem = new ManagementSystem(adminPasswordInput, userPasswordInput);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error initializing management system: " + e.getMessage());
+            return; // Exit if initialization fails due to invalid passwords (though loops should prevent this)
+        }
+
         System.out.println("Welcome to your House Management System");
-        while (true) {
-            if (role == 0) {
+        while (true) { // Main application loop
+            if (currentAccessLevel == 0) {
                 loginMenu();
-            } else if (role == 1) {
+            } else if (currentAccessLevel == 1) {
                 userMenu();
             } else {
                 adminMenu();
             }
         }
     }
-    //This prompt the method checkAccess to define admin/user role
-    private static void loginMenu() {
-        System.out.println("Please enter the Contol or Admin password (or x to exit): ");
-        String pswd = scan.nextLine();
 
-        if ("x".equals(pswd)) {
+    private static int readIntInput(String prompt) {
+        System.out.print(prompt);
+        while (!scan.hasNextInt()) {
+            System.out.println("Invalid input. Please enter a number.");
+            System.out.print(prompt);
+            scan.nextLine(); // Consume invalid input
+        }
+        int input = scan.nextInt();
+        scan.nextLine(); // Consume the newline character after the integer
+        return input;
+    }
+
+    private static void loginMenu() {
+        System.out.println("Please enter the Control or Admin password (or 'x' to exit): ");
+        String passwordAttempt = scan.nextLine();
+
+        if ("x".equalsIgnoreCase(passwordAttempt)) {
+            System.out.println("Exiting system. Goodbye!");
             System.exit(0);
         }
-        role = managementSystem.checkAccess(pswd);
-        if (role == 0) {
-            System.out.println("Access Denied, Try again: ");
+        currentAccessLevel = managementSystem.checkAccess(passwordAttempt);
+        if (currentAccessLevel == ManagementSystem.NOACCESS) {
+            System.out.println("Access Denied. Please try again.");
         }
     }
 
@@ -77,226 +171,146 @@ public class DashboardTester {
                 "12. Set day/night mode\n" +
                 "13. Exit control mode");
 
-        System.out.print("Select action: ");
-        int action = scan.nextInt();
-        scan.nextLine(); //this to clear the buffer for the next action to be made
-        //switch case for a clean dashboard experience in the terminal
-        //includes all the methods and their actions
-
+        int action = readIntInput("Select action: ");
+        // Main menu switch
         switch(action){
             case 1:
-                // Check all rooms info
                 System.out.println("All Rooms:");
-                System.out.println(managementSystem.displaySummaryAllRooms());
+                System.out.println("All Rooms Summary:\n" + managementSystem.displaySummaryAllRooms());
                 break;
             case 2:
-                //Check all devices info
-                System.out.println(managementSystem.displayInfo());
+                System.out.println("All Devices Detailed Info:\n" + managementSystem.displayInfo());
                 break;
             case 3:
-                // Check all running devices
-                System.out.println("Running Devices: \n");
-                System.out.println(managementSystem.displayAllRunningDevices());
+                System.out.println("Currently Running Devices:\n" + managementSystem.displayAllRunningDevices());
                 break;
             case 4:
-                // Check all standby devices in the day waiting list
-                System.out.println("Devices waiting for day time:");
-                System.out.println(managementSystem.listStandByDayDevices());
+                System.out.println("Devices on Standby (Waiting for Day Time):\n" + managementSystem.listStandByDayDevices());
                 break;
             case 5:
-                // Check all standby devices in the power waiting list
-                System.out.println("Devices waiting for power availability:");
-                System.out.println(managementSystem.listStandByPowerDevices());
+                System.out.println("Devices on Standby (Waiting for Power Availability):\n" + managementSystem.listStandByPowerDevices());
                 break;
             case 6:
-                // Search for a given room
-                System.out.print("Enter room code: ");
-                String roomCode = scan.nextLine();
-                Room foundRoom = managementSystem.searchRoomByCode(roomCode);
-                if(foundRoom != null){
-                    System.out.println(foundRoom);
+                System.out.print("Enter room code to search: ");
+                String roomCodeToSearch = scan.nextLine();
+                Room foundRoomDetails = managementSystem.searchRoomByCode(roomCodeToSearch);
+                if(foundRoomDetails != null){
+                    System.out.println("Room Details:\n" + foundRoomDetails);
                 }else{
-                    System.out.println("Room not found.");
+                    System.out.println("Room with code '" + roomCodeToSearch + "' not found.");
                 }
                 break;
             case 7:
-                // Search for a given device
-                System.out.print("Enter device id: ");
-                int deviceId = scan.nextInt();
-                scan.nextLine();
-                Device foundDevice = managementSystem.searchDeviceById(deviceId);
-                if(foundDevice != null){
-                    System.out.println(foundDevice);
+                int deviceIdToSearch = readIntInput("Enter device ID to search: ");
+                Device foundDeviceDetails = managementSystem.searchDeviceById(deviceIdToSearch);
+                if(foundDeviceDetails != null){
+                    System.out.println("Device Details:\n" + foundDeviceDetails);
+                    String roomLocation = managementSystem.searchRoomByDevice(foundDeviceDetails);
+                    if (roomLocation != null) {
+                        System.out.println("Located in room: " + roomLocation);
+                    }
                 }else{
-                    System.out.println("Device not found.");
+                    System.out.println("Device with ID " + deviceIdToSearch + " not found.");
                 }
                 break;
             case 8:
-                //Turn on / Turn off a device
-                System.out.print("Do you want to:\n1. Turn on a device\n other. Turn off a device\n");
-                int choice = scan.nextInt();
-                System.out.print("Enter the room code: ");
-                String rCode = scan.next();
-                Room r = managementSystem.searchRoomByCode(rCode);
-                if(r == null){
-                    System.out.println("Invalid room code");
+                int turnOnOffChoice = readIntInput("Device Operations:\n1. Turn ON a device\n2. Turn OFF a device\nSelect choice: ");
+                if (turnOnOffChoice != 1 && turnOnOffChoice != 2) {
+                    System.out.println("Invalid choice. Please select 1 or 2.");
                     break;
                 }
-                System.out.print("Enter the device id: ");
-                int dId = scan.nextInt();
-                Device d = managementSystem.searchDeviceById(dId);
-                if(d == null){
-                    System.out.println("Invalid device id");
+
+                System.out.print("Enter the room code where the device is located: ");
+                String roomCodeForDeviceOp = scan.nextLine();
+                Room targetRoomForDeviceOp = managementSystem.searchRoomByCode(roomCodeForDeviceOp);
+
+                if(targetRoomForDeviceOp == null){
+                    System.out.println("Room with code '" + roomCodeForDeviceOp + "' not found. Operation cancelled.");
                     break;
                 }
-                switch(choice){
-                    case 1:
-                        //light or app
-                        int c = 0;
-                        if(d instanceof Light){
-                            if(!((Light)d).isAdjustable()){
-                                c = 100;
-                            } else {
-                                System.out.print("Enter the brightness level: ");
-                                c = scan.nextInt();
-                            }
-                        } else {
-                            System.out.println("Enter the power level from the below:");
-                            int[] levels = ((Appliance)d).getPowerLevels();
-                            for(int i = 0; i<levels.length; i++){
-                                System.out.println(i +". " + levels[i]);
-                            }
-                            c = scan.nextInt();
-                            if(c >= levels.length) c = levels.length-1;
-                            if(c < 0) c = 0;
-                        }
-                        //ON
-                        switch(managementSystem.checkTurnOnDevice(d)){
-                            case 0:
-                                //ok
-                                managementSystem.turnOnDevice(rCode, dId, c);
-                                System.out.println("Device turned on");
-                                break;
-                            case 1:
-                                //noisy night
-                                System.out.println("the device is noisy and it's night");
-                                System.out.println("What do you want to do?");
-                                System.out.println("1. Turn on anyways");
-                                System.out.println("2. Put the device on standby");
-                                System.out.println("3. Dont turn on the device");
-                                System.out.print("Enter your choice: ");
-                                switch(scan.nextInt()){
-                                    case 1:
-                                        managementSystem.turnOnDevice(rCode, dId, c);
-                                        System.out.println("Device turned on");
-                                        break;
-                                    case 2:
-                                        managementSystem.addDeviceToWaitingListDay(d);
-                                        System.out.println("Device added to wait list");
-                                        break;
-                                    case 3:
-                                        System.out.println("Cancelled order!");
-                                        break;
-                                    default:
-                                        System.out.println("Invalid option!");
-                                        break;
-                                }
-                                break;
-                            case 2:
-                                // not enoigh power
-                                System.out.println("Not enough power!");
-                                System.out.println("What do you want to do?");
-                                System.out.println("1. add device to waitlist");
-                                System.out.println("2. cancel");
-                                System.out.print("Enter your choice: ");
-                                switch (scan.nextInt()){
-                                    case 1:
-                                        managementSystem.addDeviceToWaitingListPower(d);
-                                        System.out.println("Device added to waitlist");
-                                        break;
-                                    case 2:
-                                        System.out.println("Cancelled order!");
-                                        break;
-                                    default:
-                                        System.out.println("Invalid option");
-                                        break;
-                                }
-                                break;
-                        }
-                        break;
-                    default:
-                        //OFF
-                        if(d.isCritical()){
-                            System.out.println("Device is critical. Please enter admin password to procceed.");
-                            if(ManagementSystem.passwordIsValid(scan.next())){
-                                managementSystem.turnOffDevice(d);
-                                System.out.println("device is off");
-                            } else {
-                                System.out.println("Invalid password! Unable to turn off!");
-                            }
-                            break;
-                        } else {
-                            managementSystem.turnOffDevice(d);
-                            System.out.println("device is off");
-                        }
-                        break;
+                int deviceIdForOp = readIntInput("Enter the device ID: ");
+                Device targetDeviceForOp = managementSystem.searchDeviceById(deviceIdForOp);
+
+                if(targetDeviceForOp == null){
+                    System.out.println("Device with ID " + deviceIdForOp + " not found. Operation cancelled.");
+                    break;
+                }
+
+                if (!targetRoomForDeviceOp.getDevicesList().contains(targetDeviceForOp)) {
+                    System.out.println("Device with ID " + deviceIdForOp + " is not in room '" + roomCodeForDeviceOp + "'. Operation cancelled.");
+                    break;
+                }
+
+                if (turnOnOffChoice == 1) {
+                    handleTurnOnDevice(roomCodeForDeviceOp, deviceIdForOp, targetDeviceForOp);
+                } else { // turnOnOffChoice == 2
+                    handleTurnOffDevice(targetDeviceForOp);
                 }
                 break;
-
             case 9:
-                // Turn off all devices from one specific room
-                System.out.println("Enter room code to turn off all devices: ");
-                roomCode = scan.nextLine();
-                foundRoom = managementSystem.searchRoomByCode(roomCode);
-                if(managementSystem.checkRoomForCriticalDevice(foundRoom)){
-                    System.out.print("Critical device/s detected in the room. Please enter the admin password to proceed: ");
-                    String adminPassword = scan.nextLine();
-                    int accessLevel = managementSystem.checkAccess(adminPassword);
-                    if (accessLevel == ManagementSystem.ADMIN) {
-                        managementSystem.shutDownAllDevices();
-                        System.out.println("All devices in the room have been turned off.");
+                System.out.print("Enter room code to shut down all its devices: ");
+                String roomToShutDown = scan.nextLine();
+                Room roomForShutdown = managementSystem.searchRoomByCode(roomToShutDown);
+                if (roomForShutdown == null) {
+                    System.out.println("Room with code '" + roomToShutDown + "' not found.");
+                    break;
+                }
+                if(managementSystem.checkRoomForCriticalDevice(roomForShutdown)){
+                    System.out.print("Critical device(s) detected in room '" + roomToShutDown + "'. Admin password required to shut down all devices: ");
+                    String adminPasswordAttempt = scan.nextLine();
+                    if (managementSystem.checkAccess(adminPasswordAttempt) == ManagementSystem.ADMIN) {
+                        managementSystem.shutDownOneRoom(roomForShutdown);
+                        System.out.println("All devices in room '" + roomToShutDown + "' have been turned off.");
                     } else {
-                        managementSystem.shutDownOneRoom(foundRoom);
-                        managementSystem.setRoomCriticalDeviceStatus(foundRoom, Device.ON);
-                        System.out.println("Incorrect admin password. " +
-                                "Only non critical devices in the room have been turned off");
+                        System.out.println("Incorrect admin password. Only non-critical devices in room '" + roomToShutDown + "' will be turned off.");
+                        for (Device dev : roomForShutdown.getDevicesList()) {
+                            if (!dev.isCritical()) {
+                                managementSystem.turnOffDevice(dev);
+                            }
+                        }
+                        System.out.println("Non-critical devices in room '" + roomForShutdown.getCode() + "' turned off.");
                     }
                 }else{
-                    managementSystem.shutDownOneRoom(foundRoom);
+                    managementSystem.shutDownOneRoom(roomForShutdown);
+                    System.out.println("All devices in room '" + roomToShutDown + "' turned off successfully.");
                 }
                 break;
             case 10:
-                // Turn off all devices in the house
                 if(managementSystem.checkAllRoomsForCriticalDevice()) {
-                    System.out.print("Critical device/s detected in the house. Please enter the admin password to proceed: ");
-                    String adminPassword = scan.nextLine();
-                    int accessLevel = managementSystem.checkAccess(adminPassword);
-                    if (accessLevel == ManagementSystem.ADMIN) {
+                    System.out.print("Critical device(s) detected in the house. Admin password required to shut down all devices: ");
+                    String adminPasswordAttempt = scan.nextLine();
+                    if (managementSystem.checkAccess(adminPasswordAttempt) == ManagementSystem.ADMIN) {
                         managementSystem.shutDownAllDevices();
                         System.out.println("All devices in the house have been turned off.");
                     } else {
-                        managementSystem.shutDownAllDevices();
-                        managementSystem.setAllCriticalDeviceStatus(Device.ON);
-                        System.out.println("Incorrect admin password! Only non-critical devices have been turned off.");
+                        System.out.println("Incorrect admin password. Only non-critical devices in the house will be turned off.");
+                        for (Room room : managementSystem.getRooms()) {
+                            for (Device dev : room.getDevicesList()) {
+                                if (!dev.isCritical()) {
+                                    managementSystem.turnOffDevice(dev);
+                                }
+                            }
+                        }
+                        System.out.println("All non-critical devices in the house turned off.");
                     }
                 }else{
                     managementSystem.shutDownAllDevices();
+                    System.out.println("All devices in the house turned off successfully.");
                 }
                 break;
 
             case 11:
-                // Check current power consumption
-                System.out.println("Current power consumption: " + managementSystem.getTotalPowerConsumption());
+                System.out.println("Current total power consumption: " + managementSystem.getTotalPowerConsumption() + "W");
                 break;
             case 12:
-                //Set day/night mode
                 setDayNightMode();
                 break;
             case 13:
-                role = 0;
+                currentAccessLevel = ManagementSystem.NOACCESS;
+                System.out.println("Exited control mode.");
                 break;
             default:
-                System.out.println("Invalid action");
+                System.out.println("Invalid action. Please try again.");
 
         }
     }
@@ -311,151 +325,165 @@ public class DashboardTester {
                 "5. Add/Delete/Search a device\n" +
                 "6. Exit Admin Mode");
 
-        System.out.print("Select action: ");
-        int action = scan.nextInt();
-        scan.nextLine(); //also to clear the buffer
+        int action = readIntInput("Select action: ");
 
         switch(action){
             case 1:
-                // Change admin and user passwords
-                System.out.print("Change (1) Admin or (2) User password? ");
-                int type = scan.nextInt();
-                scan.nextLine();
+                int passwordTypeChoice = readIntInput("Change (1) Admin or (2) User password? ");
                 System.out.print("Enter new password: ");
-                String newPass = scan.nextLine();
-                if (type == 1) {
-                    managementSystem.changeAdminPassword(newPass);
-                    System.out.println("Admin password changed.");
-                } else if (type == 2) {
-                    managementSystem.changeUserPassword(newPass);
-                    System.out.println("User password changed.");
+                String newPassword = scan.nextLine();
+                if (passwordTypeChoice == 1) {
+                    try {
+                        managementSystem.changeAdminPassword(newPassword);
+                        System.out.println("Admin password changed.");
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Error: " + e.getMessage());
+                    }
+                } else if (passwordTypeChoice == 2) {
+                    try {
+                        managementSystem.changeUserPassword(newPassword);
+                        System.out.println("User password changed.");
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Error: " + e.getMessage());
+                    }
                 } else {
                     System.out.println("Invalid choice.");
                 }
                 break;
             case 2:
                 // Change power mode
-                System.out.println("Enter the max allowed power (1 = low, 2= normal, 3 = high)");
-                int mPower = scan.nextInt();
-                scan.nextLine();
-                if(mPower == 1){
-                    managementSystem.maxAllowedPower = ManagementSystem.LOW;
-                    System.out.println("Max allowed power is set to: LOW");
+                // Change power mode
+                int powerModeInput = readIntInput("Enter the max allowed power (1 = LOW, 2 = NORMAL, 3 = HIGH):");
+                double targetPower = 0;
+                String modeString = "";
+
+                switch (powerModeInput) {
+                    case 1:
+                        targetPower = ManagementSystem.LOW;
+                        modeString = "LOW";
+                        break;
+                    case 2:
+                        targetPower = ManagementSystem.NORMAL;
+                        modeString = "NORMAL";
+                        break;
+                    case 3:
+                        targetPower = ManagementSystem.HIGH;
+                        modeString = "HIGH";
+                        break;
+                    default:
+                        System.out.println("Invalid choice. Power mode not changed.");
+                        break; // Break from switch, then from case
                 }
-                else if(mPower == 2){
-                    managementSystem.maxAllowedPower = ManagementSystem.NORMAL;
-                    System.out.println("Max allowed power is set to: NORMAL");
-                }else{
-                    managementSystem.maxAllowedPower = ManagementSystem.HIGH;
-                    System.out.println("Max allowed power is set to: HIGH");
+                if (targetPower != 0) { // If a valid mode was chosen
+                    try {
+                        managementSystem.setMaxAllowedPower(targetPower);
+                        System.out.println("Max allowed power set to: " + modeString);
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Error setting power mode: " + e.getMessage());
+                    }
                 }
                 break;
             case 3:
-                // Set day time mode
                 setDayNightMode();
                 break;
             case 4:
-                //Add/Delete/Search a room
-                System.out.println("1. Add Room\n2. Delete Room\n3. Search Room");
-                int actionRoom = scan.nextInt();
-                scan.nextLine();
-                if(actionRoom == 1){
-                    System.out.print("Enter room code: ");
-                    String rCode = scan.nextLine();
-                    System.out.print("Enter room description: ");
-                    String rDesc = scan.nextLine();
-                    if(managementSystem.addRoom(new Room(rCode, rDesc))) {
-                        System.out.println("Room added.");
-                    } else {
-                        System.out.println("Room code already used");
-                    }
-                }else if (actionRoom == 2){
-                    System.out.print("Enter room code to delete: ");
-                    String code = scan.nextLine();
-                    Room roomToRemove = managementSystem.searchRoomByCode(code);
-                    if(roomToRemove != null){
-                        managementSystem.removeRooms(roomToRemove);
-                        System.out.println("Room removed!");
-                    }else{
-                        System.out.println("Room not found!");
-                    }
-                }else if(actionRoom == 3){
-                    System.out.print("Enter room code to search: ");
-                    String code = scan.nextLine();
-                    Room foundRoom = managementSystem.searchRoomByCode(code);
-                    if(foundRoom != null){
-                        System.out.println("Room found:\n" + foundRoom);
-                    }else{
-                        System.out.println("Room not found!");
-                    }
-                }else{
-                    System.out.println("Invalid option!");
+                int roomActionChoice = readIntInput("Room Operations:\n1. Add Room\n2. Delete Room\n3. Search Room\nSelect choice: ");
+                String roomCodeInput; // Declare here for wider scope if needed across choices
+                switch (roomActionChoice) {
+                    case 1: // Add Room
+                        System.out.print("Enter new room code: ");
+                        roomCodeInput = scan.nextLine();
+                        System.out.print("Enter room description: ");
+                        String roomDescriptionInput = scan.nextLine();
+                        if(managementSystem.addRoom(new Room(roomCodeInput, roomDescriptionInput))) {
+                            System.out.println("Room added.");
+                        } else {
+                            System.out.println("Room code already exists or is invalid.");
+                        }
+                        break;
+                    case 2: // Delete Room
+                        System.out.print("Enter room code to delete: ");
+                        String roomCodeToDelete = scan.nextLine(); // Changed variable name for clarity
+                        if(managementSystem.removeRoomByCode(roomCodeToDelete)) {
+                            System.out.println("Room '" + roomCodeToDelete + "' removed successfully!");
+                        } else {
+                            System.out.println("Room with code '" + roomCodeToDelete + "' not found or could not be removed.");
+                        }
+                        break;
+                    case 3: // Search Room
+                        System.out.print("Enter room code to search: ");
+                        String roomCodeToSearch = scan.nextLine(); 
+                        Room foundRoom = managementSystem.searchRoomByCode(roomCodeToSearch);
+                        if(foundRoom != null){
+                            System.out.println("Room found:\n" + foundRoom);
+                        }else{
+                            System.out.println("Room with code '" + roomCodeToSearch + "' not found.");
+                        }
+                        break;
+                    default:
+                        System.out.println("Invalid room operation choice. Please try again.");
+                        break;
                 }
                 break;
-
             case 5:
+                // Add/Delete/Search a device operations
                 addDeleteSearchDevice();
                 break;
             case 6:
-                role = 0;
+                currentAccessLevel = ManagementSystem.NOACCESS; // Log out
+                System.out.println("Exited Admin Mode."); // Added feedback for exiting admin mode
                 break;
             default:
-                System.out.println("Invalid action");
+                System.out.println("Invalid action. Please try again.");
         }
     }
 
     public static void setDayNightMode(){
-        System.out.print("Set mode 1 to Day or 2 to Night: ");
-        int dayNight = scan.nextInt();
-        if(dayNight == 1){
+        int dayNightChoice = readIntInput("Set mode:\n1. Day\n2. Night\nEnter choice: ");
+        if(dayNightChoice == 1){ // Day mode
             managementSystem.setDayTime();
-            System.out.println("System set to day mode.");
+            System.out.println("System set to Day Mode.");
             if(managementSystem.anyLightIsOn()){
-                System.out.println("Looks like the lights are still on! do you want to turn them off?");
-                System.out.println("1 = yes, other = no");
-                System.out.print("Input your choice: ");
-                if(scan.nextInt() == 1) managementSystem.turnOffAllLightsInHouse(); else System.out.println("Lights kept on");
+                System.out.println("Lights are currently on.");
+                if(readIntInput("Turn off all lights? (1 = Yes, Other = No): ") == 1) {
+                    managementSystem.turnOffAllLightsInHouse();
+                    System.out.println("All lights turned off.");
+                } else {
+                    System.out.println("Lights kept on.");
+                }
             }
-        }else if(dayNight == 2){
+        }else if(dayNightChoice == 2){ // Night mode
             managementSystem.setNightTime();
+            System.out.println("System set to Night Mode.");
             if (managementSystem.checkForRunningNoisyDevices()){
-                System.out.println("It is night! Noisy devices detected!");
-                System.out.println("Choose an option: ");
-                System.out.println("1. Keep the devices on anyways");
-                System.out.println("2. Add the devices to the day waitlist");
-                System.out.println("3. Turn the noisy devices off");
-                switch(scan.nextInt()){
+                System.out.println("Noisy devices are currently running.");
+                System.out.println("Options:\n1. Keep them on\n2. Add to day waiting list (standby)\n3. Turn them off");
+                int noisyDeviceAction = readIntInput("Enter your choice: ");
+                switch(noisyDeviceAction){
                     case 1:
-                        System.out.println("Noisy devices kept on");
-                        managementSystem.setNightTime();
-                        System.out.println("It is night!");
+                        System.out.println("Noisy devices kept on.");
                         break;
                     case 2:
                         managementSystem.addNoisyDevicesToWaitingListDay();
-                        System.out.println("Noisy devices added to waitlist");
-                        managementSystem.setNightTime();
-                        System.out.println("It is night!");
+                        System.out.println("Noisy devices added to day waiting list (standby).");
                         break;
                     case 3:
                         managementSystem.setNoisyDeviceStatus(Device.OFF);
-                        managementSystem.setNightTime();
-                        System.out.println("Noisy devices turned off");
+                        System.out.println("Noisy devices turned off.");
                         break;
                     default:
-                        System.out.println("Invalid Option");
+                        System.out.println("Invalid option for noisy devices.");
                         break;
                 }
             }
-            System.out.println("System set to night mode.");
         }else {
-            System.out.println("Invalid input.");
+            System.out.println("Invalid day/night mode choice.");
         }
     }
 
     public static void addDeleteSearchDevice(){
-        //Add/Delete/Search a device
-        System.out.println("1. Add Device\n2. Delete Device\n3. Search Device");
-        switch (scan.nextInt()){
+        // Device management submenu
+        switch (readIntInput("Device Operations:\n1. Add Device\n2. Delete Device\n3. Search Device\nSelect choice: ")){
             case 1:
                 addDevice();
                 break;
@@ -472,97 +500,87 @@ public class DashboardTester {
     }
 
     public static void addDevice(){
-        System.out.print("Enter room id: ");
-        String roomId = scan.next();
-        Room r = managementSystem.searchRoomByCode(roomId);
-        if(r == null) {
-            System.out.println("Invalid room");
+        System.out.print("Enter room code to add device to: ");
+        String roomCodeInput = scan.nextLine(); // Changed from scan.next()
+        Room targetRoom = managementSystem.searchRoomByCode(roomCodeInput);
+        if(targetRoom == null) {
+            System.out.println("Room not found.");
         } else {
-            System.out.println("Do you want to add a light or an appliance?");
-            System.out.println("1. light, 2. appliance");
-            System.out.print("Enter your choice: ");
-            int c = scan.nextInt();
-            switch(c) {
-                case 1:
-                    //light
-                    System.out.print("Enter id: ");
-                    int id = scan.nextInt();
-                    System.out.print("Enter name: ");
-                    String name = scan.next();
-                    System.out.print("Enter max power consumption: ");
-                    double maxPowerConsumption = scan.nextDouble();
-                    System.out.print("Is the device critical? (0=false, 1=true)");
-                    boolean critical = (scan.nextInt() == 1 ? true : false);
-                    System.out.print("Is the device adjustable? (0=false, 1=true)");
-                    boolean adjustable = (scan.nextInt() == 1 ? true : false);
-                    int res = managementSystem.addDevice(new Light(id, name, maxPowerConsumption, critical, adjustable), r);
-                    if(res == 0) System.out.println("added");
-                    else if (res == 1) System.out.println("Room is not present");
-                    else if (res == 2) System.out.println("Duplicate device ids, device not added");
+            int deviceTypeChoice = readIntInput("Add:\n1. Light\n2. Appliance\nEnter choice: ");
+            switch(deviceTypeChoice) {
+                case 1: // Add Light
+                    int lightId = readIntInput("Enter light ID: ");
+                    System.out.print("Enter light name: ");
+                    String lightName = scan.nextLine();
+                    System.out.print("Enter max power consumption for light: ");
+                    double lightMaxPower = Double.parseDouble(scan.nextLine()); // Using Double.parseDouble
+                    boolean isCriticalLight = (readIntInput("Is the light critical? (1=Yes, 0=No): ") == 1);
+                    boolean isAdjustableLight = (readIntInput("Is the light adjustable? (1=Yes, 0=No): ") == 1);
+                    try {
+                        managementSystem.addDevice(new Light(lightId, lightName, lightMaxPower, isCriticalLight, isAdjustableLight), targetRoom);
+                        System.out.println("Light added successfully.");
+                    } catch (RoomNotFoundException | DuplicateDeviceIdException | IllegalArgumentException e) { // Catching more specific exceptions
+                        System.out.println("Error adding light: " + e.getMessage());
+                    }
                     break;
-                case 2:
-                    //appliance
-                    System.out.print("Enter id: ");
-                    int idR = scan.nextInt();
-                    System.out.print("Enter name: ");
-                    String nameR = scan.next();
-                    System.out.print("Enter max power consumption: ");
-                    double maxPowerConsumptionR = scan.nextDouble();
-                    scan.nextLine();
-                    System.out.print("Is the device critical? (0=false, 1=true)");
-                    boolean criticalR = (scan.nextInt() == 1 ? true : false);
-                    System.out.println("enter the power levels, one at a time (-1 to stop)");
-                    ArrayList<Integer> nums = new ArrayList<Integer>();
-                    int n = scan.nextInt();
-                    scan.nextLine();
-                    while (n != -1) {
-                        if (n >= 0 && n <= 100)
-                            nums.add(n);
-                        else {
-                            System.out.println("Invalid");
-                            continue;
+                case 2: // Add Appliance
+                    int applianceId = readIntInput("Enter appliance ID: ");
+                    System.out.print("Enter appliance name: ");
+                    String applianceName = scan.nextLine();
+                    System.out.print("Enter max power consumption for appliance: ");
+                    double applianceMaxPower = Double.parseDouble(scan.nextLine());
+                    boolean isCriticalAppliance = (readIntInput("Is the appliance critical? (1=Yes, 0=No): ") == 1);
+
+                    ArrayList<Integer> powerLevelsList = new ArrayList<>();
+                    System.out.println("Enter power levels (percentage, 0-100), one per line. Type -1 to finish:");
+                    int powerLevelInput;
+                    while ((powerLevelInput = readIntInput("")) != -1) {
+                        if (powerLevelInput >= 0 && powerLevelInput <= 100) {
+                            powerLevelsList.add(powerLevelInput);
+                        } else {
+                            System.out.println("Invalid power level. Must be between 0 and 100.");
                         }
-                        n = scan.nextInt();
                     }
-                    int[] numsArray = new int[nums.size()];
-                    for (int i = 0; i < numsArray.length; i++) {
-                        numsArray[i] = nums.get(i);
+                    int[] powerLevelsArray = powerLevelsList.stream().mapToInt(Integer::intValue).toArray();
+
+                    boolean isNoisyAppliance = (readIntInput("Is the appliance noisy? (1=Yes, 0=No): ") == 1);
+                    try {
+                        managementSystem.addDevice(new Appliance(applianceId, applianceName, applianceMaxPower, isCriticalAppliance, powerLevelsArray, isNoisyAppliance), targetRoom);
+                        System.out.println("Appliance added successfully.");
+                    } catch (RoomNotFoundException | DuplicateDeviceIdException | IllegalArgumentException e) {
+                        System.out.println("Error adding appliance: " + e.getMessage());
                     }
-                    System.out.print("Is the device noisy? (0=false, 1=true)");
-                    boolean noisy = (scan.nextInt() == 1 ? true : false);
-                    int res2 = managementSystem.addDevice(new Appliance(idR, nameR, maxPowerConsumptionR, criticalR, numsArray, noisy), r);
-                    if(res2 == 0) System.out.println("added");
-                    else if (res2 == 1) System.out.println("Room is not present");
-                    else if (res2 == 2) System.out.println("Duplicate device ids, device not added");
                     break;
                 default:
-                    System.out.println("Invalid option");
+                    System.out.println("Invalid device type choice.");
                     break;
             }
         }
     }
 
     public static void deleteDevice(){
-        //id
-        System.out.print("Enter the id: ");
-        int dId = scan.nextInt();
-        Device d = managementSystem.searchDeviceById(dId);
-        if(d == null){
-            System.out.println("device invalid");
-        }else managementSystem.removeDevice(d);
-        System.out.println("Device is removed!");
+        int deviceIdToDelete = readIntInput("Enter ID of the device to delete: ");
+        if(managementSystem.removeDeviceById(deviceIdToDelete)){
+            System.out.println("Device with ID " + deviceIdToDelete + " removed successfully.");
+        } else {
+            System.out.println("Device with ID " + deviceIdToDelete + " not found or could not be removed.");
+        }
     }
 
     public static void searchDevice(){
-        //id
-        System.out.print("Enter the id: ");
-        int dId = scan.nextInt();
-        scan.nextLine();
-        Device d = managementSystem.searchDeviceById(dId);
-        if(d == null){
-            System.out.println("device invalid");
+        int deviceIdToSearch = readIntInput("Enter ID of the device to search: ");
+        Device foundDevice = managementSystem.searchDeviceById(deviceIdToSearch);
+        if(foundDevice == null){
+            System.out.println("Device not found.");
         }else {
-            System.out.println(d.toString() + " room code: " + managementSystem.searchRoomByDevice((d)));
+            System.out.println("Found device: " + foundDevice.toString());
+            String roomCode = managementSystem.searchRoomByDevice(foundDevice);
+            if (roomCode != null) {
+                System.out.println("Located in room: " + roomCode);
+            } else {
+                // This case should ideally not happen if allDevices and room device lists are consistent
+                System.out.println("Device is in the system but not currently assigned to a room.");
+            }
         }
     }
 }

@@ -3,51 +3,66 @@
 +----------------------------------------------------------+
 | - adminPassword: String                                  | // Admin password (≥8 chars, 1 uppercase, 1 lowercase, 1 digit)
 | - userPassword: String                                   | // User password (same rules as admin)
-| - rooms: ArrayList<Room>                                 | // List of rooms managed
+| - rooms: Map<String, Room>                               | // Map of rooms managed, with room code as key
+| - allDevices: Map<Integer, Device>                       | // Map of all devices in the system, with device ID as key
 | - maxAllowedPower: double                                | // Current maximum allowed power (LOW/NORMAL/HIGH)
 | - day: boolean                                           | // True = Daytime, False = Nighttime
 | - waitingListDay: ArrayList<Device>                      | // Noisy devices waiting for daytime to run
 | - waitingListPower: ArrayList<Device>                    | // Devices waiting for enough power to run
 +----------------------------------------------------------+
-| + LOW: int = 1000                                        | // Low power mode limit
-| + NORMAL: int = 4000                                     | // Normal power mode limit
-| + HIGH: int = 10000                                      | // High power mode limit
+| + LOW: int = 1000                                        | // Low power mode limit (static final)
+| + NORMAL: int = 4000                                     | // Normal power mode limit (static final)
+| + HIGH: int = 10000                                      | // High power mode limit (static final)
+| + NOACCESS: int = 0                                      | // No access level (static final)
+| + USER: int = 1                                          | // User access level (static final)
+| + ADMIN: int = 2                                         | // Admin access level (static final)
 +----------------------------------------------------------+
 | + ManagementSystem(adminPassword: String,                |
 |                    userPassword: String)                 | // Constructor, initializes system
-| - setAdminPassword(adminPassword: String): void          | // Sets admin password after validation
-| - setUserPassword(userPassword: String): void            | // Sets user password after validation
-| - passwordIsValid(s: String): boolean                    | // Checks password validity (length, upper, lower, digit)
-| + changeAdminPassword(adminPassword: String): void       | // Changes admin password if valid
-| + changeUserPassword(userPassword: String): void         | // Changes user password if valid
+| + setAdminPassword(adminPassword: String): void          | // Sets admin password after validation (throws IllegalArgumentException)
+| + setUserPassword(userPassword: String): void            | // Sets user password after validation (throws IllegalArgumentException)
+| + passwordIsValid(s: String): boolean                    | // Checks password validity (public static: length≥8, 1 upper, 1 lower, 1 digit)
+| + changeAdminPassword(adminPassword: String): void       | // Changes admin password if valid (uses setAdminPassword)
+| + changeUserPassword(userPassword: String): void         | // Changes user password if valid (uses setUserPassword)
 | + displaySummaryAllRooms(): String                       | // Displays summary info of all rooms
 | + displayDetailsOneRoom(code: String): String            | // Displays detailed info of a specific room by code
-| + addRoom(r: Room): void                                 | // Adds a new room
-| + addDevice(d: Device, r: Room): boolean                 | // Adds a device to a specified room
-| + removeRooms(r: Room): boolean                          | // Removes a room
-| + removeDevice(d: Device): boolean                       | // Removes a device from any room
-| + setDayTime(): void                                     | // Sets system to day mode; may turn on lights
-| + setNightTime(): void                                   | // Sets system to night mode; handles noisy devices
+| + addRoom(r: Room): boolean                              | // Adds a new room, returns true if successful
+| + addDevice(d: Device, r: Room): void                    | // Adds a device to a specified room (throws RoomNotFoundException, DuplicateDeviceIdException)
+| + removeRooms(r: Room): boolean                          | // Removes a room (delegates to removeRoomByCode)
+| + removeRoomByCode(roomCode: String): boolean            | // Removes a room by its code and its devices from allDevices
+| + removeDevice(d: Device): boolean                       | // Removes a device (delegates to removeDeviceById)
+| + removeDeviceById(deviceId: int): boolean               | // Removes a device by its ID from its room and allDevices
+| + setDayTime(): void                                     | // Sets system to day mode; processes day waiting list
+| + setNightTime(): void                                   | // Sets system to night mode
 | + turnOnDevice(roomCode: String, deviceId: int): boolean  | // Turns on a device in a room
-| + checkTurnOnDevice(d: Device): int                      | // Checks if device can be turned on (0 = OK, 1 = noisy at night, 2 = not enough power)
+| + turnOnDevice(roomCode: String, deviceId: int, level: int): boolean | // Turns on a device (Appliance/Light) to a specific level
+| + checkTurnOnDevice(d: Device): int                      | // Checks if device can be turned on (0=OK, 1=noisy@night, 2=no power)
 | + turnOffDevice(roomCode: String, deviceId: int): boolean | // Turns off a device in a room
-| + turnOffDevice(d: Device): void                         | // Turns off a device and checks standby lists
+| + turnOffDevice(d: Device): void                         | // Turns off a device and checks power waiting list
 | + shutDownOneRoom(r: Room): void                         | // Turns off all devices in a specific room
 | + shutDownAllDevices(): void                             | // Turns off all devices in all rooms
 | + searchRoomByCode(code: String): Room                   | // Searches for a room by its code
 | + searchDeviceById(id: int): Device                      | // Searches for a device by its ID
-| + displayInfo(): String                                  | // (Planned) Displays general system information
-| - tryToTurnOnDevicesDay(): void                          | // Turns on devices waiting for daytime
-| - getTotalPowerConsumption(): double                     | // Calculates total power consumption
-| + checkAccess(s: String): int                            | // Authenticates user or admin access (1=user, 2=admin, 0=denied)
-| - tryToTurnOnDevicesPower(): void                        | // Turns on devices from the power waiting list if possible
-| + turnOnAllLightsInHouse(): void                         | // Turns on all Light devices across all rooms
-| + checkForRunningNoisyDevices(): boolean                  | // Checks if any noisy devices are running at night
+| + displayInfo(): String                                  | // Displays general system information
+| - tryToTurnOnDevicesDay(): void                          | // Turns on devices waiting for daytime (private helper)
+| + setMaxAllowedPower(power: double): void                | // Sets the maximum allowed power (LOW, NORMAL, HIGH, throws IllegalArgumentException)
+| - getTotalPowerConsumption(): double                     | // Calculates total power consumption (private helper, but could be public if needed for Dashboard)
+| + checkAccess(s: String): int                            | // Authenticates user or admin access (0=no, 1=user, 2=admin)
+| - tryToTurnOnDevicesPower(): void                        | // Turns on devices from the power waiting list (private helper)
+| + turnOffAllLightsInHouse(): void                         | // Turns off all Light devices across all rooms
+| + checkForRunningNoisyDevices(): boolean                  | // Checks if any noisy devices are running
 | + setNoisyDeviceStatus(newStatus: int): void             | // Changes status of all noisy devices
 | + addDeviceToWaitingListDay(d: Device): void             | // Adds device to day standby list
-| + RemoveDeviceFromWaitingListDay(d: Device): void        | // Removes device from day standby list
-| + listStandByDayDevices(): String                        | // Lists devices waiting for daytime       //returning only ids not the object
+| - removeDeviceFromWaitingListDay(d: Device): void        | // Removes device from day standby list (private helper)
+| + listStandByDayDevices(): String                        | // Lists devices waiting for daytime (returns IDs)
 | + addDeviceToWaitingListPower(d: Device): void           | // Adds device to power standby list
-| + RemoveDeviceFromWaitingListPower(d: Device): void      | // Removes device from power standby list
-| + listStandByPowerDevices(): String                      | // Lists devices waiting for enough power      //returning only ids not the object
+| - removeDeviceFromWaitingListPower(d: Device): void      | // Removes device from power standby list (private helper)
+| + listStandByPowerDevices(): String                      | // Lists devices waiting for enough power (returns IDs)
+| + setAllCriticalDeviceStatus(newStatus: int): void       | // Sets status for all critical devices
+| + setRoomCriticalDeviceStatus(r: Room, newStatus: int): void | // Sets status for critical devices in a specific room
+| + checkAllRoomsForCriticalDevice(): boolean              | // Checks if any critical devices exist in any room
+| + checkRoomForCriticalDevice(r: Room): boolean           | // Checks if a room contains any critical devices
+| + searchRoomByDevice(otherDevice: Device): String        | // Finds room code for a given device
+| + anyLightIsOn(): boolean                                | // Checks if any light is currently on
+| + getRooms(): Collection<Room>                           | // Returns a collection of all rooms
 +----------------------------------------------------------+

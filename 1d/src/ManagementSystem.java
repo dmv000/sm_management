@@ -1,11 +1,15 @@
 import java.util.ArrayList;
 import java.lang.StringBuilder;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Collection;
 
 public class ManagementSystem {
     private String adminPassword; //size >= 8 //1 upper case,1 lower, 1 digit at least
     private String userPassword; //same as admin
-    private ArrayList<Room> rooms;
-    protected double maxAllowedPower; //?
+    private Map<String, Room> rooms;
+    private Map<Integer, Device> allDevices;
+    private double maxAllowedPower; //?
     //3 power modes
     public final static int LOW = 1000;
     public final static int NORMAL = 4000;
@@ -20,7 +24,8 @@ public class ManagementSystem {
     private ArrayList<Device> waitingListPower; //standby until power allows it
 
     public ManagementSystem(String adminPassword, String userPassword){
-        rooms = new ArrayList<Room>();
+        rooms = new HashMap<>();
+        allDevices = new HashMap<>();
         waitingListDay = new ArrayList<Device>();
         waitingListPower = new ArrayList<Device>();
         setAdminPassword(adminPassword);
@@ -30,13 +35,19 @@ public class ManagementSystem {
     }
 
     public void setAdminPassword(String adminPassword) {
-        if(passwordIsValid(adminPassword)) this.adminPassword = adminPassword;
+        if (!passwordIsValid(adminPassword)) {
+            throw new IllegalArgumentException("Invalid admin password format.");
+        }
+        this.adminPassword = adminPassword;
     }
 
     public void setUserPassword(String userPassword) {
-        if(passwordIsValid(userPassword)) this.userPassword = userPassword;
+        if (!passwordIsValid(userPassword)) {
+            throw new IllegalArgumentException("Invalid user password format.");
+        }
+        this.userPassword = userPassword;
     }
-//this should be public and static i guess to work?
+
     public static boolean passwordIsValid(String s){
         boolean isUpper = false, isLower = false, isDigit = false;
         if(s.length() < 8) return false;
@@ -59,8 +70,8 @@ public class ManagementSystem {
 
     public String displaySummaryAllRooms(){
         StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < rooms.size(); i++){
-            sb.append(rooms.get(i));
+        for(Room room : rooms.values()){
+            sb.append(room.toString()); // Assuming Room has a good toString()
             sb.append("\n");
         }
         return sb.toString();
@@ -68,79 +79,91 @@ public class ManagementSystem {
 
     //search by code
     public String displayDetailsOneRoom(String code){
-        for(int i = 0; i < rooms.size(); i++){
-            if(rooms.get(i).getCode().equals(code)) return rooms.get(i).toString();
-        }
-        return null;
+        Room room = rooms.get(code);
+        return (room != null) ? room.toString() : null;
     }
 
     public boolean addRoom(Room r){
         //check if the added room has the same id to prevent code duplicates
-        for(Room room : rooms){
-            if(r.getCode().equals(room.getCode())) return false;
-        }
-        rooms.add(r);
+        if(rooms.containsKey(r.getCode())) return false;
+        rooms.put(r.getCode(), r);
         return true;
     }
     //returns false if another room has the same code;
 
-    public int addDevice(Device d, Room r){
-        //check if anoother device has the same id in this room or another >> to prevent id duplicates
-        //(other methods deal with devices using an id basis)
-        for(Room room : rooms){
-            for(Device device :room.getDevicesList()){
-                if(device.equals(d)) return 2;
-            }
+    public void addDevice(Device d, Room r){
+        // The Room r parameter is assumed to be a valid, managed room object.
+        // The caller is responsible for fetching it using searchRoomByCode first.
+        if (r == null) { // Should ideally not happen if caller fetches room correctly
+            throw new IllegalArgumentException("Room cannot be null.");
         }
-        //check if room is present
-        for(Room room : rooms){
-            if(room.equals(r)){
-                room.addDevice(d);
-                return 0;
-            }
+        if (!rooms.containsKey(r.getCode()) || rooms.get(r.getCode()) != r) {
+             // Defensive check: Ensure 'r' is the one from our map, or a room with its code exists.
+            throw new RoomNotFoundException("Room with code " + r.getCode() + " not found or is not the managed instance.");
         }
-        return 1;
+
+        // Check if another device has the same id
+        if(allDevices.containsKey(d.getId())) {
+            throw new DuplicateDeviceIdException("Device with ID " + d.getId() + " already exists.");
+        }
+
+        // If checks pass, add the device to the room's internal list and the global map
+        r.addDevice(d);
+        allDevices.put(d.getId(), d);
     }
-    //return 0 if added correctly
-    //return 1 if room is not present
-    //return 2 if device id is already used
 
     public boolean removeRooms(Room r){
-        if(!rooms.contains(r)) return false;
-        else rooms.remove(r);
+        // This method can be deprecated or updated.
+        // For now, let's assume it might be kept for compatibility or specific use cases.
+        // If it's to be removed, DashboardTester would need to change.
+        // If kept, it should align with the new Map structure.
+        if (r == null || !rooms.containsKey(r.getCode())) return false;
+        return removeRoomByCode(r.getCode());
+    }
+
+    public boolean removeRoomByCode(String roomCode){
+        Room roomToRemove = rooms.get(roomCode);
+        if(roomToRemove == null) return false;
+
+        // Remove all devices in this room from the allDevices map
+        for(Device device : roomToRemove.getDevicesList()){
+            allDevices.remove(device.getId());
+        }
+        rooms.remove(roomCode);
         return true;
     }
-    //add remove room by code
 
     public boolean removeDevice(Device d){
-        for(int i = 0; i < rooms.size(); i++){
-            for(int j = 0; j < rooms.get(i).getDevicesList().size(); j++){
-                if(rooms.get(i).getDevicesList().get(j).equals(d)){
-                    rooms.get(i).getDevicesList().remove(j);
-                    return true;
-                }
+        // This method can be updated to call removeDeviceById
+        if (d == null) return false;
+        return removeDeviceById(d.getId());
+    }
+
+    public boolean removeDeviceById(int deviceId){
+        Device deviceToRemove = allDevices.get(deviceId);
+        if(deviceToRemove == null) return false;
+
+        // Find the room containing this device and remove it from the room's list
+        for(Room room : rooms.values()){
+            if(room.getDevicesList().contains(deviceToRemove)){
+                room.removeDevice(deviceToRemove); // Assumes Room class has removeDevice(Device d)
+                break; // Device should only be in one room
             }
         }
-        return false;
+        allDevices.remove(deviceId);
+        return true;
     }
-    //add remove device by id; optional
 
     public void setDayTime(){
         day = true;
-        if(tryToTurnOnDevicesDay() == 1){
-            System.out.println("StandBy devices turned on");
-        } else if (tryToTurnOnDevicesDay() == 2){
-            System.out.println("Standby devices put on power standby");
-        }
+        tryToTurnOnDevicesDay();
+        // System.out.println calls removed as per instructions
     }
-    //setDaytime is prompted, ask user if he wants to turn on all lights in the house or not
-    //use method --turnOnAllLightsInHouse()
 
     public void setNightTime(){
         day = false;
+        // Ensure all System.out.println calls are handled by DashboardTester
     }
-    //when set night --> checks for running noisy devices --> input user --> off / standy by in waitlist / kept on (ask user)
-    //use methods --checkForRuningNoisyDevices() --setNoisyDeviceStatus()
 
     public boolean turnOnDevice(String roomCode, int deviceId){
         //check if roomCode is valid
@@ -178,10 +201,6 @@ public class ManagementSystem {
         return false;
     }
     //returns false is device is not found in the room or room is invalid
-    //use --checkTurnOnDevice() in main to check for the conditions:
-    //if(checkTurnOnDevice(d)) turnOnDevice
-    //use a switch for all other conditions
-
     public int checkTurnOnDevice(Device d){
         if(d.getConsumptionIfOn() + getTotalPowerConsumption() > maxAllowedPower) return 2;
         if(d instanceof Appliance){
@@ -189,17 +208,14 @@ public class ManagementSystem {
         }
         return 0;
     }
-    //0 >> no constraints
-    //1 >> noisy and night>> can turn on anyway / standby+waiting list / cancel (ask user)
-    //2 >> not enough power --> waitlist / cancel (ask user)
-
     public boolean turnOffDevice(String roomCode, int deviceId){
+        Room room = searchRoomByCode(roomCode);
         //check if roomCode is valid
-        if(searchRoomByCode(roomCode) == null) return false;
+        if(room == null) return false;
         //check room if the device is present
-        for(int i = 0; i < searchRoomByCode(roomCode).getDevicesList().size(); i++){
-            if(searchRoomByCode(roomCode).getDevicesList().get(i).getId() == deviceId){
-                turnOffDevice(searchRoomByCode(roomCode).getDevicesList().get(i));
+        for(int i = 0; i < room.getDevicesList().size(); i++){
+            if(room.getDevicesList().get(i).getId() == deviceId){
+                turnOffDevice(room.getDevicesList().get(i));
                 return true;
             }
         }
@@ -221,27 +237,19 @@ public class ManagementSystem {
     }
 
     public void shutDownAllDevices(){
-        for(int i = 0; i < rooms.size(); i++){
-            for(int j = 0; j < rooms.get(i).getDevicesList().size(); j++){
-                turnOffDevice(rooms.get(i).getCode(), rooms.get(i).getDevicesList().get(j).getId());
+        for(Room room : rooms.values()){
+            for(Device device : room.getDevicesList()){
+                turnOffDevice(device); // Use the version that takes a Device object
             }
         }
     }
 
     public Room searchRoomByCode(String code){
-        for(int i = 0; i < rooms.size(); i++){
-            if(rooms.get(i).getCode().equals(code)) return rooms.get(i);
-        }
-        return null;
+        return rooms.get(code);
     }
 
     public Device searchDeviceById(int id){
-        for(int i = 0; i < rooms.size(); i++){
-            for(int j = 0; j < rooms.get(i).getDevicesList().size(); j++){
-                if(rooms.get(i).getDevicesList().get(j).getId() == id) return rooms.get(i).getDevicesList().get(j);
-            }
-        }
-        return null;
+        return allDevices.get(id);
     }
 
     public String displayInfo(){
@@ -249,7 +257,7 @@ public class ManagementSystem {
         sb.append("Time = " + (day ? "day" : "night") + "\n");
         sb.append("Max allowed power = " + maxAllowedPower + "\n");
         sb.append("Current power consumption = " + getTotalPowerConsumption() +"\n");
-        for(Room room : rooms){
+        for(Room room : rooms.values()){
             sb.append("Room code " + room.getCode() + ":\n");
             for(Device d : room.getDevicesList()){
                 sb.append(d.toString() +"\n");
@@ -258,40 +266,36 @@ public class ManagementSystem {
         return sb.toString();
     }
 
-    //More code
 
     //when day is set, check the waitlist and turn on the devices if possible, if not, send it to powerWaitList
-    private int tryToTurnOnDevicesDay(){
-        if(waitingListDay.size() != 0){
-            for(int i = 0; i < waitingListDay.size(); i++){
-                if(waitingListDay.get(i).getConsumptionIfOn() + getTotalPowerConsumption() <= maxAllowedPower){
-                    waitingListDay.get(i).turnOn();
-                    waitingListDay.remove(waitingListDay.get(i));
-                    return 1;
-                } else {
-                    waitingListPower.add(waitingListDay.get(i));
-                    waitingListDay.remove(waitingListDay.get(i));
-                    return 2;
-                }
+    private void tryToTurnOnDevicesDay(){
+        java.util.Iterator<Device> iterator = waitingListDay.iterator();
+        while (iterator.hasNext()) {
+            Device device = iterator.next();
+            if (device.getConsumptionIfOn() + getTotalPowerConsumption() <= maxAllowedPower) {
+                device.turnOn(); // Assumes turnOn also sets status correctly
+                iterator.remove(); // Remove from waitingListDay
+            } else {
+                waitingListPower.add(device); // Add to power waiting list
+                iterator.remove(); // Remove from waitingListDay
             }
         }
-        return 0;
+        // Return type changed to void, System.out.println calls removed
     }
-    //0 if no devices turned on
-    //1 if devices turned on
-    //2 if put on waitlist
 
     //normal setter
-    public void setMaxAllowedPower(double maxAllowedPower) {
-        if(maxAllowedPower == LOW || maxAllowedPower == NORMAL || maxAllowedPower == HIGH)
-            this.maxAllowedPower = maxAllowedPower;
+    public void setMaxAllowedPower(double power) {
+        if(power == LOW || power == NORMAL || power == HIGH)
+            this.maxAllowedPower = power;
+        else
+            throw new IllegalArgumentException("Invalid power mode specified. Must be LOW, NORMAL, or HIGH.");
     }
 
     //calculate total consumption between all rooms
     public double getTotalPowerConsumption(){
         double count = 0;
-        for(int i = 0; i < rooms.size(); i++){
-            count += rooms.get(i).getCurrentConsumption();
+        for(Room room : rooms.values()){
+            count += room.getCurrentConsumption();
         }
         return count;
     }
@@ -301,37 +305,34 @@ public class ManagementSystem {
         if(s.equals(userPassword)) return USER;
         if(s.equals(adminPassword)) return ADMIN;
         else return NOACCESS;
-        //set mode?? boolean\
-        //when exit admin mode / user mode --> display main menu;
     }
 
-    //when a device is turned off, check if a new device(s) can be turned on
     private void tryToTurnOnDevicesPower(){
-        if(waitingListPower.size() != 0){
-            for(int i = 0; i < waitingListPower.size(); i++) {
-                if (waitingListPower.get(i).getConsumptionIfOn() + getTotalPowerConsumption() <= maxAllowedPower) {
-                    waitingListPower.get(i).turnOn();
-                    waitingListPower.remove(waitingListPower.get(i));
-                }
+        java.util.Iterator<Device> iterator = waitingListPower.iterator();
+        while (iterator.hasNext()) {
+            Device device = iterator.next();
+            if (device.getConsumptionIfOn() + getTotalPowerConsumption() <= maxAllowedPower) {
+                device.turnOn(); // Assumes turnOn also sets status correctly
+                iterator.remove(); // Remove from waitingListPower
             }
+            // If not enough power, it just stays in waitingListPower for the next attempt.
         }
     }
 
     public void turnOffAllLightsInHouse(){
-        for(int i = 0; i < rooms.size(); i++){
-            for(int j = 0; j < rooms.get(i).getDevicesList().size(); j++){
-                if(rooms.get(i).getDevicesList().get(j) instanceof Light)
-                    rooms.get(i).getDevicesList().get(j).turnOff();
+        for(Room room : rooms.values()){
+            for(Device device : room.getDevicesList()){
+                if(device instanceof Light)
+                    device.turnOff();
             }
         }
     }
 
     public boolean checkForRunningNoisyDevices(){
-        for(int i = 0; i < rooms.size(); i++){
-            for(int j = 0; j < rooms.get(i).getDevicesList().size(); j++){
-                if(rooms.get(i).getDevicesList().get(j) instanceof Appliance){
-                    if (((Appliance)rooms.get(i).getDevicesList().get(j)).isNoisy()
-                    && ((Appliance)rooms.get(i).getDevicesList().get(j)).getStatus() == Device.ON)
+        for(Room room : rooms.values()){
+            for(Device device : room.getDevicesList()){
+                if(device instanceof Appliance){
+                    if (((Appliance)device).isNoisy() && device.getStatus() == Device.ON)
                         return true;
                 }
             }
@@ -342,11 +343,11 @@ public class ManagementSystem {
     public String displayAllRunningDevices() {
         StringBuilder sb = new StringBuilder();
         boolean empty = true;
-        for (int i = 0; i < rooms.size(); i++) {
-            for (int j = 0; j < rooms.get(i).getDevicesList().size(); j++) {
-                if (rooms.get(i).getDevicesList().get(j).getStatus() == Device.ON) {
+        for (Room room : rooms.values()) {
+            for (Device device : room.getDevicesList()) {
+                if (device.getStatus() == Device.ON) {
                     empty = false;
-                    sb.append(rooms.get(i).getDevicesList().get(j).toString() + "\n");
+                    sb.append(device.toString() + "\n");
                 }
             }
         }
@@ -355,14 +356,12 @@ public class ManagementSystem {
 
     //set the newStatus for all noisy devices only
     public void setNoisyDeviceStatus(int newStatus){
-        for(int i = 0; i < rooms.size(); i++){
-            for(int j = 0; j < rooms.get(i).getDevicesList().size(); j++){
-                if(rooms.get(i).getDevicesList().get(j) instanceof Appliance
-                        && ((Appliance) rooms.get(i).getDevicesList().get(j)).isNoisy()){
-                    rooms.get(i).getDevicesList().get(j).setStatus(newStatus);
-                    //add to waitlist if standby
+        for(Room room : rooms.values()){
+            for(Device device : room.getDevicesList()){
+                if(device instanceof Appliance && ((Appliance) device).isNoisy()){
+                    device.setStatus(newStatus);
                     if(newStatus == Device.STANDBY){
-                        waitingListDay.add((rooms.get(i).getDevicesList().get(j)));
+                        waitingListDay.add(device);
                     }
                 }
             }
@@ -376,11 +375,11 @@ public class ManagementSystem {
     }
 
     public void addNoisyDevicesToWaitingListDay(){
-        for(int i = 0; i < rooms.size(); i++){
-            for(int j = 0; j < rooms.get(i).getDevicesList().size(); j++){
-                if(rooms.get(i).getDevicesList().get(j) instanceof Appliance){
-                    if(((Appliance) rooms.get(i).getDevicesList().get(j)).isNoisy()){
-                        addDeviceToWaitingListDay(rooms.get(i).getDevicesList().get(j));
+        for(Room room : rooms.values()){
+            for(Device device : room.getDevicesList()){
+                if(device instanceof Appliance){
+                    if(((Appliance) device).isNoisy()){
+                        addDeviceToWaitingListDay(device);
                     }
                 }
             }
@@ -424,27 +423,30 @@ public class ManagementSystem {
     //critical(setStatus/set)
 
     public void setAllCriticalDeviceStatus(int newStatus){
-        for(int i = 0; i < rooms.size(); i++){
-            for(int j = 0; j < rooms.get(i).getDevicesList().size(); j++){
-                if(rooms.get(i).getDevicesList().get(j).isCritical()){
-                    rooms.get(i).getDevicesList().get(j).setStatus(newStatus);
+        for(Room room : rooms.values()){
+            for(Device device : room.getDevicesList()){
+                if(device.isCritical()){
+                    device.setStatus(newStatus);
                 }
             }
         }
     }
 
     public void setRoomCriticalDeviceStatus(Room r, int newStatus){
-        for(int i = 0; i < r.getDevicesList().size(); i++){
-            if(r.getDevicesList().get(i).isCritical()){
-                rooms.get(i).getDevicesList().get(i).setStatus(newStatus);
+        // Assuming r is a valid room object obtained from the rooms map
+        if (r != null && rooms.containsKey(r.getCode())) {
+            for(Device device : r.getDevicesList()){ // Iterate through devices in the passed room 'r'
+                if(device.isCritical()){
+                    device.setStatus(newStatus);
+                }
             }
         }
     }
 
     public boolean checkAllRoomsForCriticalDevice(){
-        for(int i = 0; i < rooms.size(); i++){
-            for(int j = 0; j < rooms.get(i).getDevicesList().size(); j++){
-                if(rooms.get(i).getDevicesList().get(j).isCritical()){
+        for(Room room : rooms.values()){
+            for(Device device : room.getDevicesList()){
+                if(device.isCritical()){
                     return true;
                 }
             }
@@ -462,18 +464,17 @@ public class ManagementSystem {
     }
 
     public String searchRoomByDevice(Device otherDevice){
-        for(Room room : rooms){
-            for(Device device : room.getDevicesList()){
-                if(device.equals(otherDevice)){
-                    return room.getCode();
-                }
+        if (otherDevice == null) return null;
+        for(Room room : rooms.values()){
+            if(room.getDevicesList().contains(otherDevice)){
+                return room.getCode();
             }
         }
         return null;
     }
 
     public boolean anyLightIsOn(){
-        for(Room room : rooms){
+        for(Room room : rooms.values()){
             for(Device d : room.getDevicesList()){
                 if(d instanceof Light){
                     if(d.getStatus() == Device.ON) return true;
@@ -481,5 +482,9 @@ public class ManagementSystem {
             }
         }
         return false;
+    }
+
+    public Collection<Room> getRooms() {
+        return rooms.values();
     }
 }
